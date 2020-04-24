@@ -176,6 +176,7 @@ class AccountEntity extends BaseModel
 
     /**
      *
+     * @throws AmountException
      */
     public function validate()
     {

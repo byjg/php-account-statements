@@ -285,6 +285,8 @@ class StatementEntity extends BaseModel
 
     /**
      *
+     * @throws AmountException
+     * @throws AmountException
      */
     public function validate()
     {

@@ -7,6 +7,7 @@ use ByJG\AnyDataset\Db\DbDriverInterface;
 use ByJG\MicroOrm\Mapper;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\Repository;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 
 class AccountRepository extends BaseRepository
 {
@@ -31,7 +32,7 @@ class AccountRepository extends BaseRepository
      * @param string $accountType
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getUserId($idUser, $accountType = "")
     {
@@ -52,7 +53,7 @@ class AccountRepository extends BaseRepository
      * @param $idAccountType
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAccountTypeId($idAccountType)
     {

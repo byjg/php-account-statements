@@ -4,7 +4,9 @@
 namespace ByJG\AccountStatements\Exception;
 
 
-class AmountException extends \Exception
+use Exception;
+
+class AmountException extends Exception
 {
 
 }

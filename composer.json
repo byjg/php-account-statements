@@ -5,6 +5,7 @@
   "prefer-stable": true,
   "license": "MIT",
   "require": {
+    "ext-pdo": "*",
     "byjg/micro-orm": "4.0.*"
   },
   "autoload": {

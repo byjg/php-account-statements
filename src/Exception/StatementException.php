@@ -4,7 +4,9 @@
 namespace ByJG\AccountStatements\Exception;
 
 
-class StatementException extends \Exception
+use Exception;
+
+class StatementException extends Exception
 {
 
 }

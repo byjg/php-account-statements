@@ -5,7 +5,9 @@ namespace ByJG\AccountStatements\Bll;
 use ByJG\AccountStatements\Entity\AccountTypeEntity;
 use ByJG\AccountStatements\Exception\AccountTypeException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
-use InvalidArgumentException;
+use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
+use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 
 class AccountTypeBLL
 {
@@ -27,13 +29,9 @@ class AccountTypeBLL
      * Se o ID não for passado, então devolve todos os AccountTypes.
      *
      * @param int|string $idAccountType Opcional. Se não for passado obtém todos
-     * @return AccountTypeEntity|\ByJG\AccountStatements\Entity\AccountTypeEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return AccountTypeEntity|AccountTypeEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getById($idAccountType)
     {
@@ -45,14 +43,11 @@ class AccountTypeBLL
      *
      * @param mixed $data
      * @return int Id do objeto inserido atualizado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @throws AccountTypeException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\OrmBeforeInvalidException
-     * @throws \ByJG\MicroOrm\Exception\OrmInvalidFieldsException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws InvalidArgumentException
      */
     public function update($data)
     {

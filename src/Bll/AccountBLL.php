@@ -11,12 +11,14 @@ use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
-use ByJG\AccountStatements\Repository\AccountTypeRepository;
-use ByJG\AccountStatements\Repository\StatementRepository;
+use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
+use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
-use InvalidArgumentException;
 use PDOException;
 
 class AccountBLL
@@ -56,13 +58,9 @@ class AccountBLL
      * Se o ID não for passado, então devolve todos os Accounts.
      *
      * @param int $idAccount Opcional. Se não for passado obtém todos
-     * @return AccountEntity|\ByJG\AccountStatements\Entity\AccountEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return AccountEntity|AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getById($idAccount)
     {
@@ -76,12 +74,8 @@ class AccountBLL
      * @param int $idUser
      * @param string $accountType Tipo de conta
      * @return AccountEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getUserId($idUser, $accountType = "")
     {
@@ -95,17 +89,11 @@ class AccountBLL
      *
      * @param int $idAccountType
      * @return AccountEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getAccountTypeId($idAccountType)
     {
-        
-
         return $this->accountRepository->getAccountTypeId($idAccountType);
     }
 
@@ -119,15 +107,14 @@ class AccountBLL
      * @param int $minValue
      * @param string $extra
      * @return int
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @throws AccountException
+     * @throws AccountTypeException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws TransactionException
+     * @throws AmountException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\OrmBeforeInvalidException
-     * @throws \ByJG\MicroOrm\Exception\OrmInvalidFieldsException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function createAccount($idAccountType, $idUser, $balance, $price = 1, $minValue = 0, $extra = null)
     {
@@ -178,8 +165,7 @@ class AccountBLL
      * @param float|int $newMinValue
      * @param string $description
      * @throws Exception
-     * @return boolean
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return int
      */
     public function overrideBalance(
         $idAccount,
@@ -239,8 +225,8 @@ class AccountBLL
      * Encerra (Zera) uma conta
      *
      * @param int $idAccount
-     * @throws \Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return int
+     * @throws Exception
      */
     public function closeAccount($idAccount)
     {
@@ -251,13 +237,11 @@ class AccountBLL
      * @param $idaccount
      * @param $balance
      * @param string $description
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return int
+     * @throws InvalidArgumentException
+     * @throws TransactionException
+     * @throws AmountException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Exception
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function partialBalance($idaccount, $balance, $description = "Partial Balance")
     {

@@ -3,6 +3,7 @@
 namespace ByJG\AccountStatements\Entity;
 
 use ByJG\Serializer\BaseModel;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 
 /**
  * @SWG\Definition(
@@ -71,7 +72,7 @@ class RollbackEntity extends BaseModel
 
     /**
      * @return string
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function encode()
     {
@@ -80,7 +81,7 @@ class RollbackEntity extends BaseModel
 
     /**
      * @param $code
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function decode($code)
     {

@@ -9,11 +9,9 @@ use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\MicroOrm\ConnectionManager;
-use DomainException;
+use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
-use InvalidArgumentException;
-use OutOfRangeException;
-use UnderflowException;
 
 class StatementBLL
 {
@@ -44,13 +42,9 @@ class StatementBLL
      * Se o ID não for passado, então devolve todos os Statements.
      *
      * @param int|string $idStatement Opcional. Se não for passado obtém todos
-     * @return \ByJG\AccountStatements\Entity\StatementEntity|\ByJG\AccountStatements\Entity\StatementEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getById($idStatement)
     {
@@ -65,11 +59,9 @@ class StatementBLL
      * @param string $description
      * @param string $reference
      * @return int Id do Statement Adicionado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws AmountException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function addFunds($idaccount, $amount, $description = null, $reference = null)
     {
@@ -123,11 +115,9 @@ class StatementBLL
      * @param string $description
      * @param string $reference
      * @return int Id do Statement Adicionado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
+     * @throws AmountException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function withdrawFunds($idaccount, $amount, $description = null, $reference = null)
     {
@@ -184,11 +174,9 @@ class StatementBLL
      * @param string $description
      * @param string $reference
      * @return int id do statement adicionado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws AmountException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function reserveFundsForWithdraw($idaccount, $amount, $description = null, $reference = null)
     {
@@ -246,11 +234,9 @@ class StatementBLL
      * @param string $description
      * @param string $reference
      * @return int id do statement adicionado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws AmountException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function reserveFundsForDeposit($idaccount, $amount, $description = null, $reference = null)
     {
@@ -299,11 +285,8 @@ class StatementBLL
      * @param int $statementId
      * @param string $description
      * @return int id do statement gerado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function acceptFundsById($statementId, $description = null)
     {
@@ -363,11 +346,8 @@ class StatementBLL
      * @param int $statementId
      * @param string $description
      * @return int id do statement adicionado
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\TransactionException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws TransactionException
+     * @throws Exception
      */
     public function rejectFundsById($statementId, $description = null)
     {
@@ -426,12 +406,8 @@ class StatementBLL
      *
      * @param int $idAccount
      * @return StatementEntity[]
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getUnclearedStatements($idAccount = null)
     {
@@ -443,12 +419,8 @@ class StatementBLL
      *
      * @param int $idStatement
      * @return bool
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function isStatementUncleared($idStatement = null)
     {
@@ -456,11 +428,7 @@ class StatementBLL
     }
 
     /**
-     * @return \ByJG\AccountStatements\Repository\StatementRepository
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @return StatementRepository
      */
     public function getRepository()
     {

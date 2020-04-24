@@ -6,6 +6,8 @@ use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AnyDataset\Db\DbDriverInterface;
 use ByJG\MicroOrm\Mapper;
 use ByJG\MicroOrm\Query;
+use ByJG\MicroOrm\Repository;
+use ByJG\Serializer\Exception\InvalidArgumentException;
 
 class StatementRepository extends BaseRepository
 {
@@ -22,7 +24,7 @@ class StatementRepository extends BaseRepository
             'idstatement'
         );
 
-        $this->repository = new \ByJG\MicroOrm\Repository($dbDriver, $mapper);
+        $this->repository = new Repository($dbDriver, $mapper);
     }
 
     /**
@@ -32,7 +34,7 @@ class StatementRepository extends BaseRepository
      * @param bool $forUpdate
      * @return StatementEntity
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getByIdParent($idParent, $forUpdate = false)
     {
@@ -59,7 +61,7 @@ class StatementRepository extends BaseRepository
      * @param int $limit
      * @return StatementEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getByAccountId($idAccount, $limit = 20)
     {
@@ -76,7 +78,7 @@ class StatementRepository extends BaseRepository
      * @param null $idaccount
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\Serializer\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function getUnclearedStatements($idaccount = null)
     {
