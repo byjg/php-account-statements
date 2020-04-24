@@ -473,5 +473,56 @@ class AccountStatementsTest extends TestCase
 
     }
 
+    public function testCloseAccount()
+    {
+        // Populate Data!
+        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+
+        $this->statementBLL->addFunds($idAccount, 400);
+        $this->statementBLL->addFunds($idAccount, 200);
+        $this->statementBLL->withdrawFunds($idAccount, 300);
+
+        $idStatement = $this->accountBLL->closeAccount($idAccount);
+
+        $account = $this->accountBLL->getById($idAccount)->toArray();
+        unset($account["entrydate"]);
+
+        // Executar teste
+        $this->assertEquals([
+            'idaccount' => $idAccount,
+            'idaccounttype' => 'USDTEST',
+            'iduser' => '-1',
+            'grossbalance' => '0.00000',
+            'uncleared' => '0.00000',
+            'netbalance' => '0.00000',
+            'price' => '0.00000',
+            'extra' => '',
+            'minvalue' => '0.00000',
+        ],
+            $account
+        );
+
+        $statement = $this->statementBLL->getById($idStatement)->toArray();
+        unset($statement["date"]);
+
+        $this->assertEquals([
+            'idaccount' => $idAccount,
+            'idaccounttype' => 'USDTEST',
+            'grossbalance' => '0.00000',
+            'uncleared' => '0.00000',
+            'netbalance' => '0.00000',
+            'price' => '0.00000',
+            'idstatement' => $idStatement,
+            'idtype' => 'B',
+            'amount' => '0.00000',
+            'description' => 'Reset Balance',
+            'idstatementparent' => '',
+            'reference' => ''
+        ],
+            $statement
+        );
+
+    }
+
 
 }
