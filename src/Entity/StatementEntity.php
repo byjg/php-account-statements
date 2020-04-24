@@ -2,6 +2,7 @@
 
 namespace ByJG\AccountStatements\Entity;
 
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\Serializer\BaseModel;
 
 /**
@@ -288,7 +289,7 @@ class StatementEntity extends BaseModel
     public function validate()
     {
         if ($this->getAmount() < 0) {
-            throw new \UnderflowException('Amount não pode ser menor que zero');
+            throw new AmountException('Amount não pode ser menor que zero');
         }
 
         if (empty($this->account)) {
@@ -299,7 +300,7 @@ class StatementEntity extends BaseModel
             || $this->getGrossBalance() < $this->account->getMinValue()
             || $this->getUnCleared() < $this->account->getMinValue()
         ) {
-            throw new \OutOfRangeException('Valor não pode ser menor que ' . $this->account->getMinValue());
+            throw new AmountException('Valor não pode ser menor que ' . $this->account->getMinValue());
         }
     }
 }

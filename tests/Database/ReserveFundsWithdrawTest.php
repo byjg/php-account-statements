@@ -70,7 +70,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testReserveForWithdrawFunds_Invalid()
     {
@@ -108,7 +108,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException UnderflowException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testReserveForWithdrawFunds_NegativeInvalid()
     {
@@ -118,7 +118,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException OutOfRangeException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testAcceptFundsById_InvalidId()
     {
@@ -129,7 +129,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException OutOfRangeException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testAcceptFundsById_InvalidType()
     {
@@ -141,7 +141,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException DomainException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testAcceptFundsById_HasParentTransation()
     {
@@ -189,7 +189,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testRejectFundsById_InvalidId()
     {
@@ -200,7 +200,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException OutOfRangeException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testRejectFundsById_InvalidType()
     {
@@ -212,7 +212,7 @@ class ReserveFundsWithdrawTest extends TestCase
     }
 
     /**
-     * @expectedException DomainException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testRejectFundsById_HasParentTransation()
     {

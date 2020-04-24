@@ -71,7 +71,7 @@ class ReserveFundsDepositTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testReserveForDepositFunds_Invalid()
     {
@@ -120,7 +120,7 @@ class ReserveFundsDepositTest extends TestCase
 //    }
 //
     /**
-     * @expectedException OutOfRangeException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testAcceptFundsById_InvalidType()
     {
@@ -132,7 +132,7 @@ class ReserveFundsDepositTest extends TestCase
     }
 
     /**
-     * @expectedException DomainException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testAcceptFundsById_HasParentTransation()
     {
@@ -180,7 +180,7 @@ class ReserveFundsDepositTest extends TestCase
     }
 
     /**
-     * @expectedException OutOfRangeException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testRejectFundsById_InvalidType()
     {
@@ -192,7 +192,7 @@ class ReserveFundsDepositTest extends TestCase
     }
 
     /**
-     * @expectedException DomainException
+     * @expectedException \ByJG\AccountStatements\Exception\StatementException
      */
     public function testRejectFundsById_HasParentTransation()
     {

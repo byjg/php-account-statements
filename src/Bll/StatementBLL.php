@@ -3,6 +3,9 @@
 namespace ByJG\AccountStatements\Bll;
 
 use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AccountException;
+use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\MicroOrm\ConnectionManager;
@@ -72,7 +75,7 @@ class StatementBLL
     {
         // Validações
         if ($amount <= 0) {
-            throw new InvalidArgumentException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount precisa ser maior que zero');
         }
 
         // Obtem DAL de Account
@@ -83,7 +86,7 @@ class StatementBLL
         try {
             $account = $this->accountRepository->getById($idaccount);
             if (is_null($account) || $account->getIdAccount() == "") {
-                throw new InvalidArgumentException("addFunds: Account $idaccount not found");
+                throw new AccountException("addFunds: Account $idaccount not found");
             }
 
             // Atualiza os valores em Account
@@ -129,7 +132,7 @@ class StatementBLL
     public function withdrawFunds($idaccount, $amount, $description = null, $reference = null)
     {
         if ($amount <= 0) {
-            throw new InvalidArgumentException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount precisa ser maior que zero');
         }
 
         
@@ -139,12 +142,12 @@ class StatementBLL
         try {
             $account = $this->accountRepository->getById($idaccount);
             if (is_null($account)) {
-                throw new InvalidArgumentException('addFunds: Account not found');
+                throw new AccountException('addFunds: Account not found');
             }
 
             // Se o valor a ser retirado é negativo, então dá um erro.
             if ($account->getNetBalance() - $amount < $account->getMinValue()) {
-                throw new UnderflowException('O valor de retirada é maior que o saldo disponível em conta');
+                throw new AmountException('O valor de retirada é maior que o saldo disponível em conta');
             }
 
             // Atualiza os dados
@@ -191,7 +194,7 @@ class StatementBLL
     {
         // Validações
         if ($amount <= 0) {
-            throw new InvalidArgumentException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount precisa ser maior que zero');
         }
 
         
@@ -201,12 +204,12 @@ class StatementBLL
         try {
             $account = $this->accountRepository->getById($idaccount);
             if (is_null($account)) {
-                throw new InvalidArgumentException('reserveFundsForWithdraw: Account not found');
+                throw new AccountException('reserveFundsForWithdraw: Account not found');
             }
 
             // Se o valor a ser retirado é negativo, então dá um erro.
             if ($account->getNetBalance() - $amount < $account->getMinValue()) {
-                throw new UnderflowException('O valor de retirada é maior que o saldo disponível em conta');
+                throw new AmountException('O valor de retirada é maior que o saldo disponível em conta');
             }
 
             // Atualiza os dados
@@ -253,7 +256,7 @@ class StatementBLL
     {
         // Validações
         if ($amount <= 0) {
-            throw new InvalidArgumentException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount precisa ser maior que zero');
         }
 
         $connectionManager = new ConnectionManager();
@@ -261,7 +264,7 @@ class StatementBLL
         try {
             $account = $this->accountRepository->getById($idaccount);
             if (is_null($account)) {
-                throw new InvalidArgumentException('reserveFundsForDeposit: Account not found');
+                throw new AccountException('reserveFundsForDeposit: Account not found');
             }
 
             // Atualiza os dados
@@ -309,17 +312,17 @@ class StatementBLL
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
-                throw new InvalidArgumentException('acceptFundsById: Statement not found');
+                throw new StatementException('acceptFundsById: Statement not found');
             }
 
             // Verifica se o statement é de um depósito bloqueado.
             if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
-                throw new OutOfRangeException('O Id passado não é de um fundo bloqueado');
+                throw new StatementException('O Id passado não é de um fundo bloqueado');
             }
 
             // Verifica se já foi realizado anteriormente esse processo.
             if ($this->statementRepository->getByIdParent($statementId) != null) {
-                throw new DomainException('O Id passado já possui uma transação associada');
+                throw new StatementException('O Id passado já possui uma transação associada');
             }
 
             // Obtém os dados de account e faz os ajustes
@@ -373,17 +376,17 @@ class StatementBLL
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
-                throw new InvalidArgumentException('acceptFundsById: Statement not found');
+                throw new StatementException('acceptFundsById: Statement not found');
             }
 
             // Verifica se o statement é de um depósito bloqueado.
             if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
-                throw new OutOfRangeException('O Id passado não é de um fundo bloqueado');
+                throw new StatementException('O Id passado não é de um fundo bloqueado');
             }
 
             // Verifica se já foi realizado anteriormente esse processo.
             if ($this->statementRepository->getByIdParent($statementId) != null) {
-                throw new DomainException('O Id passado já possui uma trnasação associada');
+                throw new StatementException('O Id passado já possui uma trnasação associada');
             }
 
             // Obtém os dados de account e faz os ajustes

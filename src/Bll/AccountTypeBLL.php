@@ -3,6 +3,7 @@
 namespace ByJG\AccountStatements\Bll;
 
 use ByJG\AccountStatements\Entity\AccountTypeEntity;
+use ByJG\AccountStatements\Exception\AccountTypeException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use InvalidArgumentException;
 
@@ -59,11 +60,11 @@ class AccountTypeBLL
         $idAccountType = $object->getIdAccountType();
 
         if (empty($object->getIdAccountType())) {
-            throw new InvalidArgumentException('Id account type não pode ser em branco');
+            throw new AccountTypeException('Id account type não pode ser em branco');
         }
 
         if (empty($object->getName())) {
-            throw new InvalidArgumentException('Nome não pode ser em branco');
+            throw new AccountTypeException('Nome não pode ser em branco');
         }
 
         $this->accountTypeRepository->save($object);

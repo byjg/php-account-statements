@@ -2,6 +2,7 @@
 
 namespace ByJG\AccountStatements\Entity;
 
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\Serializer\BaseModel;
 
 /**
@@ -184,7 +185,7 @@ class AccountEntity extends BaseModel
             || $this->getGrossBalance() < $minValue
             || $this->getUnCleared() < $minValue
         ) {
-            throw new \OutOfRangeException('Valor não pode ser menor que ' . $minValue);
+            throw new AmountException('Valor não pode ser menor que ' . $minValue);
         }
     }
 }

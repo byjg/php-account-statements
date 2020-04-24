@@ -9,6 +9,9 @@ namespace ByJG\AccountStatements\Bll;
 
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AccountException;
+use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
@@ -130,7 +133,7 @@ class AccountBLL
     {
         // Faz as validações
         if ($this->accountTypeBLL->getById($idAccountType) == null) {
-            throw new InvalidArgumentException('IdAccountType ' . $idAccountType . ' não existe');
+            throw new AccountTypeException('IdAccountType ' . $idAccountType . ' não existe');
         }
 
         // Define os dados
@@ -151,7 +154,7 @@ class AccountBLL
             $idAccount = $result->getIdAccount();
         } catch (PDOException $ex) {
             if (strpos($ex->getMessage(), "Duplicate entry") !== false) {
-                throw new Exception("Usuário $idUser já possui uma conta do tipo $idAccountType");
+                throw new AccountException("Usuário $idUser já possui uma conta do tipo $idAccountType");
             } else {
                 throw $ex;
             }
@@ -189,7 +192,7 @@ class AccountBLL
         $model = $this->accountRepository->getById($idAccount);
 
         if (empty($model)) {
-            throw new InvalidArgumentException('Id da conta não existe. Não é possível fechar a conta');
+            throw new AccountException('Id da conta não existe. Não é possível fechar a conta');
         }
 
         // Get total value reserved
@@ -202,7 +205,7 @@ class AccountBLL
         }
 
         if ($newBalance - $unclearedValues < $newMinValue) {
-            throw new \UnderflowException(
+            throw new StatementException(
                 "Nâo é possível alterar para esse valor pois ainda existem $qtd transações pendentes " .
                 "totalizando $unclearedValues milhas"
             );

@@ -209,7 +209,7 @@ class AccountStatementsTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testAddFunds_Invalid()
     {
@@ -249,7 +249,7 @@ class AccountStatementsTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testWithdrawFunds_Invalid()
     {
@@ -289,7 +289,7 @@ class AccountStatementsTest extends TestCase
     }
 
     /**
-     * @expectedException UnderflowException
+     * @expectedException \ByJG\AccountStatements\Exception\AmountException
      */
     public function testWithdrawFunds_NegativeInvalid()
     {
