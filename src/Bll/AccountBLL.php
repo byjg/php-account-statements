@@ -159,6 +159,8 @@ class AccountBLL
 
         if ($balance > 0) {
             $this->statementBLL->addFunds($idAccount, $balance, "Opening Balance");
+        } elseif ($balance < 0) {
+            $this->statementBLL->withdrawFunds($idAccount, abs($balance), "Opening Balance");
         }
 
         return $idAccount;

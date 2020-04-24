@@ -18,7 +18,7 @@ class StatementEntity extends BaseModel
     const DEPOSIT = "D"; // Adiciona um valor imediatamente ao banco
     const WITHDRAW = "W";
     const REJECT = "R";
-    //const DepositBlocked = "DB";
+    const DEPOSITBLOCKED = "DB";
     const WITHDRAWBLOCKED = "WB";
 
     /**

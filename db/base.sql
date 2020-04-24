@@ -65,7 +65,7 @@ CREATE TABLE `statement` (
   `idstatement` int(11) NOT NULL AUTO_INCREMENT,
   `idaccount` int(11) NOT NULL,
   `idaccounttype` varchar(20) COLLATE utf8_bin NOT NULL,
-  `idtype` enum('B','D','W','WB','R') COLLATE utf8_bin NOT NULL COMMENT 'B: Balance - Inicia um novo valor desprezando os antigos\nD: Deposit: Adiciona um valor imediatamente ao banco\nW: Withdrawal\nR: Reject\nWD: Withdrawal (blocked, uncleared)\n',
+  `idtype` enum('B','D','W','DB','WB','R') COLLATE utf8_bin NOT NULL COMMENT 'B: Balance - Inicia um novo valor desprezando os antigos\nD: Deposit: Adiciona um valor imediatamente ao banco\nW: Withdrawal\nR: Reject\nWD: Withdrawal (blocked, uncleared)\n',
   `amount` decimal(15,5) NOT NULL,
   `price` decimal(15,5) DEFAULT '1.00000',
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

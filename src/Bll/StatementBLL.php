@@ -201,7 +201,7 @@ class StatementBLL
         try {
             $account = $this->accountRepository->getById($idaccount);
             if (is_null($account)) {
-                throw new InvalidArgumentException('addFunds: Account not found');
+                throw new InvalidArgumentException('reserveFundsForWithdraw: Account not found');
             }
 
             // Se o valor a ser retirado é negativo, então dá um erro.
@@ -219,6 +219,61 @@ class StatementBLL
             $statement->setIdAccount($idaccount);
             $statement->setAmount($amount);
             $statement->setIdType(StatementEntity::WITHDRAWBLOCKED);
+            $statement->setDescription($description);
+            $statement->setReference($reference);
+            $statement->attachAccount($account);
+
+            $result = $this->statementRepository->save($statement);
+
+            $connectionManager->commitTransaction();
+
+            return $result->getIdStatement();
+        } catch (Exception $ex) {
+            $connectionManager->rollbackTransaction();
+
+            throw $ex;
+        }
+    }
+
+    /**
+     * Reserva fundos para serem sacados (abate do valor líquido, mas não do Bruto)
+     *
+     * @param int $idaccount
+     * @param float $amount
+     * @param string $description
+     * @param string $reference
+     * @return int id do statement adicionado
+     * @throws \ByJG\Config\Exception\ConfigNotFoundException
+     * @throws \ByJG\Config\Exception\EnvironmentException
+     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @throws \ByJG\MicroOrm\Exception\TransactionException
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    public function reserveFundsForDeposit($idaccount, $amount, $description = null, $reference = null)
+    {
+        // Validações
+        if ($amount <= 0) {
+            throw new InvalidArgumentException('Amount precisa ser maior que zero');
+        }
+
+        $connectionManager = new ConnectionManager();
+        $connectionManager->beginTransaction();
+        try {
+            $account = $this->accountRepository->getById($idaccount);
+            if (is_null($account)) {
+                throw new InvalidArgumentException('reserveFundsForDeposit: Account not found');
+            }
+
+            // Atualiza os dados
+            $account->setUnCleared($account->getUnCleared() - $amount);
+            $account->setNetBalance($account->getNetBalance() + $amount);
+            $this->accountRepository->save($account);
+
+            // Cria o statement
+            $statement = new StatementEntity();
+            $statement->setIdAccount($idaccount);
+            $statement->setAmount($amount);
+            $statement->setIdType(StatementEntity::DEPOSITBLOCKED);
             $statement->setDescription($description);
             $statement->setReference($reference);
             $statement->attachAccount($account);
@@ -258,7 +313,7 @@ class StatementBLL
             }
 
             // Verifica se o statement é de um depósito bloqueado.
-            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED) {
+            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
                 throw new OutOfRangeException('O Id passado não é de um fundo bloqueado');
             }
 
@@ -268,10 +323,11 @@ class StatementBLL
             }
 
             // Obtém os dados de account e faz os ajustes
-            
+            $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? 1 : -1;
+
             $account = $this->accountRepository->getById($statement->getIdAccount());
-            $account->setUnCleared($account->getUnCleared() - $statement->getAmount());
-            $account->setGrossBalance($account->getGrossBalance() - $statement->getAmount());
+            $account->setUnCleared($account->getUnCleared() + ($statement->getAmount() * $signal));
+            $account->setGrossBalance($account->getGrossBalance() + ($statement->getAmount() * $signal));
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
@@ -279,7 +335,7 @@ class StatementBLL
             $statement->setIdStatementParent($statement->getIdStatement());
             $statement->setIdStatement(null); // Poder criar um novo registro
             $statement->setDate(null);
-            $statement->setIdType(StatementEntity::WITHDRAW);
+            $statement->setIdType($statement->getIdType() == StatementEntity::WITHDRAWBLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
             $statement->attachAccount($account);
             if (!empty($description)) {
                 $statement->setDescription($description);
@@ -321,7 +377,7 @@ class StatementBLL
             }
 
             // Verifica se o statement é de um depósito bloqueado.
-            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED) {
+            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
                 throw new OutOfRangeException('O Id passado não é de um fundo bloqueado');
             }
 
@@ -331,10 +387,11 @@ class StatementBLL
             }
 
             // Obtém os dados de account e faz os ajustes
-            
+            $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? -1 : +1;
+
             $account = $this->accountRepository->getById($statement->getIdAccount());
-            $account->setUnCleared($account->getUnCleared() - $statement->getAmount());
-            $account->setNetBalance($account->getNetBalance() + $statement->getAmount());
+            $account->setUnCleared($account->getUnCleared() - ($statement->getAmount() * $signal));
+            $account->setNetBalance($account->getNetBalance() + ($statement->getAmount() * $signal));
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
