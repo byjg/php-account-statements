@@ -227,7 +227,7 @@ class AccountBLL
         $statement->setIdAccountType($model->getIdAccountType());
         $this->statementBLL->getRepository()->save($statement);
 
-        return true;
+        return $statement->getIdStatement();
     }
 
     /**
@@ -239,7 +239,7 @@ class AccountBLL
      */
     public function closeAccount($idAccount)
     {
-        $this->overrideBalance($idAccount, 0, 0, 0);
+        return $this->overrideBalance($idAccount, 0, 0, 0);
     }
 
     /**
@@ -261,9 +261,11 @@ class AccountBLL
         $amount = $balance - $account->getNetBalance();
 
         if ($amount > 0) {
-            $this->statementBLL->addFunds($idaccount, $amount, $description);
+            $idStatement = $this->statementBLL->addFunds($idaccount, $amount, $description);
         } elseif ($amount < 0) {
-            $this->statementBLL->withdrawFunds($idaccount, abs($amount), $description);
+            $idStatement = $this->statementBLL->withdrawFunds($idaccount, abs($amount), $description);
         }
+
+        return $idStatement;
     }
 }

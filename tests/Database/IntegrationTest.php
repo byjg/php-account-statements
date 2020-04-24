@@ -599,4 +599,97 @@ class IntegrationTest extends TestCase
             $accountEntity
         ], $account);
     }
+
+    public function testOverrideFunds()
+    {
+        // Populate Data!
+        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+
+        $idStatement = $this->accountBLL->overrideBalance($idAccount, 650);
+        $account = $this->accountBLL->getById($idAccount)->toArray();
+        unset($account["entrydate"]);
+
+        // Executar teste
+        $this->assertEquals([
+                'idaccount' => $idAccount,
+                'idaccounttype' => 'USDTEST',
+                'iduser' => '-1',
+                'grossbalance' => '650.00000',
+                'uncleared' => '0.00000',
+                'netbalance' => '650.00000',
+                'price' => '1.00000',
+                'extra' => '',
+                'minvalue' => '0.00000',
+            ],
+            $account
+        );
+
+        $statement = $this->statementBLL->getById($idStatement)->toArray();
+        unset($statement["date"]);
+
+        $this->assertEquals([
+                'idaccount' => $idAccount,
+                'idaccounttype' => 'USDTEST',
+                'grossbalance' => '650.00000',
+                'uncleared' => '0.00000',
+                'netbalance' => '650.00000',
+                'price' => '1.00000',
+                'idstatement' => $idStatement,
+                'idtype' => 'B',
+                'amount' => '650.00000',
+                'description' => 'Reset Balance',
+                'idstatementparent' => '',
+                'reference' => ''
+            ],
+            $statement
+        );
+    }
+
+    public function testPartialFunds()
+    {
+        // Populate Data!
+        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+
+        $idStatement = $this->accountBLL->partialBalance($idAccount, 650);
+        $account = $this->accountBLL->getById($idAccount)->toArray();
+        unset($account["entrydate"]);
+
+        // Executar teste
+        $this->assertEquals([
+                'idaccount' => $idAccount,
+                'idaccounttype' => 'USDTEST',
+                'iduser' => '-1',
+                'grossbalance' => '650.00000',
+                'uncleared' => '0.00000',
+                'netbalance' => '650.00000',
+                'price' => '1.00000',
+                'extra' => '',
+                'minvalue' => '0.00000',
+            ],
+            $account
+        );
+
+        $statement = $this->statementBLL->getById($idStatement)->toArray();
+        unset($statement["date"]);
+
+        $this->assertEquals([
+                'idaccount' => $idAccount,
+                'idaccounttype' => 'USDTEST',
+                'grossbalance' => '650.00000',
+                'uncleared' => '0.00000',
+                'netbalance' => '650.00000',
+                'price' => '1.00000',
+                'idstatement' => $idStatement,
+                'idtype' => 'W',
+                'amount' => '350.00000',
+                'description' => 'Partial Balance',
+                'idstatementparent' => '',
+                'reference' => ''
+            ],
+            $statement
+        );
+
+    }
+
+
 }
