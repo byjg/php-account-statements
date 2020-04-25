@@ -524,5 +524,82 @@ class AccountStatementsTest extends TestCase
 
     }
 
+    public function testGetByDate()
+    {
+        // Populate Data!
+        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $this->statementBLL->addFunds($idAccount, 400);
+        $this->statementBLL->withdrawFunds($idAccount, 300);
+
+        $ignore = $this->accountBLL->createAccount('BRLTEST', -999, 1000); // I dont want this account
+        $this->statementBLL->addFunds($ignore, 200);
+
+        $startDate = date('Y'). "/" . date('m') . "/01";
+        $endDate = (date('Y') + (date('m') == 12 ? 1 : 0)) . "/" . (date('m') == 12 ? 1 : date('m') + 1) . "/01";
+
+        $statementList = $this->statementBLL->getByDate($idAccount, $startDate, $endDate);
+
+        // Executar teste
+        $this->assertEquals(
+            [
+                [
+                    'idaccount' => $idAccount,
+                    'idaccounttype' => 'USDTEST',
+                    'grossbalance' => '1000.00000',
+                    'uncleared' => '0.00000',
+                    'netbalance' => '1000.00000',
+                    'price' => '1.00000',
+                    'idstatement' => '2',
+                    'idtype' => 'D',
+                    'amount' => '1000.00000',
+                    'description' => 'Opening Balance',
+                    'reference' => '',
+                    'idstatementparent' => ''
+                ],
+                [
+                    'idaccount' => $idAccount,
+                    'idaccounttype' => 'USDTEST',
+                    'grossbalance' => '1400.00000',
+                    'uncleared' => '0.00000',
+                    'netbalance' => '1400.00000',
+                    'price' => '1.00000',
+                    'idstatement' => '3',
+                    'idtype' => 'D',
+                    'amount' => '400.00000',
+                    'description' => '',
+                    'reference' => '',
+                    'idstatementparent' => ''
+                ],
+                [
+                    'idaccount' => $idAccount,
+                    'idaccounttype' => 'USDTEST',
+                    'grossbalance' => '1100.00000',
+                    'uncleared' => '0.00000',
+                    'netbalance' => '1100.00000',
+                    'price' => '1.00000',
+                    'idstatement' => '4',
+                    'idtype' => 'W',
+                    'amount' => '300.00000',
+                    'description' => '',
+                    'reference' => '',
+                    'idstatementparent' => ''
+                ],
+            ],
+            array_map(
+                function ($value) {
+                    $value = $value->toArray();
+                    unset($value["date"]);
+                    return $value;
+                },
+                $statementList
+            )
+        );
+
+        $statementList = $this->statementBLL->getByDate($idAccount, '1900/01/01', '1900/02/01');
+
+        $this->assertEquals([], $statementList);
+
+    }
+
 
 }

@@ -71,8 +71,6 @@ class StatementBLL
         }
 
         // Obtem DAL de Account
-        
-
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
@@ -124,8 +122,6 @@ class StatementBLL
         if ($amount <= 0) {
             throw new AmountException('Amount precisa ser maior que zero');
         }
-
-        
 
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
@@ -184,8 +180,6 @@ class StatementBLL
         if ($amount <= 0) {
             throw new AmountException('Amount precisa ser maior que zero');
         }
-
-        
 
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
@@ -412,6 +406,11 @@ class StatementBLL
     public function getUnclearedStatements($idAccount = null)
     {
         return $this->statementRepository->getUnclearedStatements($idAccount);
+    }
+
+    public function getByDate($idAccount, $startDate, $endDate)
+    {
+        return $this->statementRepository->getByDate($idAccount, $startDate, $endDate);
     }
 
     /**

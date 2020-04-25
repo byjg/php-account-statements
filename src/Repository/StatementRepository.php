@@ -101,4 +101,22 @@ class StatementRepository extends BaseRepository
 
         return $this->repository->getByQuery($query);
     }
+
+    /**
+     * @param null $idaccount
+     * @return array
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     */
+    public function getByDate($idaccount, $startDate, $endDate)
+    {
+        $query = Query::getInstance()
+            ->table($this->repository->getMapper()->getTable())
+            ->where("date between :start and :end", ["start" => $startDate, "end" => $endDate])
+            ->where("idaccount = :id", ["id" => $idaccount])
+            ->orderBy(["date"])
+        ;
+
+        return $this->repository->getByQuery($query);
+    }
 }
