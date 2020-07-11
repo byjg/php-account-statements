@@ -6,7 +6,7 @@
   "license": "MIT",
   "require": {
     "ext-pdo": "*",
-    "byjg/micro-orm": "4.1.0.x-dev"
+    "byjg/micro-orm": "4.1.*"
   },
   "autoload": {
     "psr-4": {
