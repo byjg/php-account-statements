@@ -15,6 +15,6 @@
   },
   "require-dev": {
     "phpunit/phpunit": "5.7.*|7.4.*",
-    "byjg/migration": "4.1.0.x-dev"
+    "byjg/migration": "4.1.*"
   }
 }
