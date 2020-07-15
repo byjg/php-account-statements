@@ -90,7 +90,7 @@ class StatementRepository extends BaseRepository
             ->table($this->repository->getMapper()->getTable() . " st1")
             ->join("account ac", "st1.idaccount = ac.idaccount")
             ->leftJoin("statement st2", "st1.idstatement = st2.idstatementparent")
-            ->where("st1.idtype = 'WB'")
+            ->where("st1.idtype in ('WB', 'DB')")
             ->where("st2.idstatement is null")
             ->orderBy(["st1.date desc"])
         ;

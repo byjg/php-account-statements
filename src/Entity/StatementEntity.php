@@ -80,6 +80,12 @@ class StatementEntity extends BaseModel
      * @var string
      * @SWG\Property()
      */
+    protected $code;
+
+    /**
+     * @var string
+     * @SWG\Property()
+     */
     protected $description;
 
     /**
@@ -172,6 +178,14 @@ class StatementEntity extends BaseModel
     /**
      * @return string
      */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @return string
+     */
     public function getDescription()
     {
         return $this->description;
@@ -244,6 +258,11 @@ class StatementEntity extends BaseModel
     public function setNetBalance($netbalance)
     {
         $this->netbalance = $netbalance;
+    }
+
+    public function setCode($code)
+    {
+        $this->code = $code;
     }
 
     public function setDescription($description)
