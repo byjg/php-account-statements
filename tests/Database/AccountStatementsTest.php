@@ -2,6 +2,7 @@
 
 namespace Test;
 
+use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
@@ -83,7 +84,7 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 10, 'Test', 'Referencia');
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 10)->setDescription( 'Test')->setReference('Referencia')->setCode('XYZ'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -98,6 +99,7 @@ class AccountStatementsTest extends TestCase
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
         $statement->setReference('Referencia');
+        $statement->setCode('XYZ');
         $statement->setIdAccountType('USDTEST');
 
         $actual = $this->statementBLL->getById($idStatement);
@@ -117,8 +119,8 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 10, 'Test', 'Referencia');
-        $this->statementBLL->withdrawFunds($idAccount, 50, 'Test', 'Referencia');
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 10)->setDescription( 'Test')->setReference('Referencia'));
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 50)->setDescription('Test')->setReference('Referencia'));
 
         $statement = [];
 
@@ -127,6 +129,7 @@ class AccountStatementsTest extends TestCase
         $statement[0]->setAmount('1000.00000');
         $statement[0]->setDate('2015-01-24');
         $statement[0]->setDescription('Opening Balance');
+        $statement[0]->setCode('BAL');
         $statement[0]->setGrossBalance('1000.00000');
         $statement[0]->setIdAccount($idAccount);
         $statement[0]->setIdStatement(2);
@@ -185,7 +188,7 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->addFunds($idAccount, 250, 'Test Add Funds', 'Referencia Add Funds');
+        $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 250)->setDescription('Test Add Funds')->setReference('Referencia Add Funds'));
 
         // Check
         $statement = new StatementEntity;
@@ -217,14 +220,14 @@ class AccountStatementsTest extends TestCase
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
         // Check;
-        $this->statementBLL->addFunds($idAccount, -15);
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, -15));
     }
 
     public function testWithdrawFunds()
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 350)->setDescription( 'Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -257,14 +260,14 @@ class AccountStatementsTest extends TestCase
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
         // Check
-        $this->statementBLL->withdrawFunds($idAccount, -15);
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, -15));
     }
 
     public function testWithdrawFunds_Negative()
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 1150, 'Test Withdraw', 'Referencia Withdraw');
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 1150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -295,7 +298,7 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
-        $this->statementBLL->withdrawFunds($idAccount, 1401, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
     /**
@@ -421,7 +424,8 @@ class AccountStatementsTest extends TestCase
                 'amount' => '650.00000',
                 'description' => 'Reset Balance',
                 'idstatementparent' => '',
-                'reference' => ''
+                'reference' => '',
+                'code' => 'BAL'
             ],
             $statement
         );
@@ -466,7 +470,8 @@ class AccountStatementsTest extends TestCase
                 'amount' => '350.00000',
                 'description' => 'Partial Balance',
                 'idstatementparent' => '',
-                'reference' => ''
+                'reference' => '',
+                'code' => ''
             ],
             $statement
         );
@@ -478,9 +483,9 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
-        $this->statementBLL->addFunds($idAccount, 400);
-        $this->statementBLL->addFunds($idAccount, 200);
-        $this->statementBLL->withdrawFunds($idAccount, 300);
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 400));
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 200));
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 300));
 
         $idStatement = $this->accountBLL->closeAccount($idAccount);
 
@@ -517,7 +522,8 @@ class AccountStatementsTest extends TestCase
             'amount' => '0.00000',
             'description' => 'Reset Balance',
             'idstatementparent' => '',
-            'reference' => ''
+            'reference' => '',
+            'code' => 'BAL'
         ],
             $statement
         );
@@ -528,11 +534,11 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->addFunds($idAccount, 400);
-        $this->statementBLL->withdrawFunds($idAccount, 300);
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 400));
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 300));
 
         $ignore = $this->accountBLL->createAccount('BRLTEST', -999, 1000); // I dont want this account
-        $this->statementBLL->addFunds($ignore, 200);
+        $this->statementBLL->addFunds(StatementDTO::instance($ignore, 200));
 
         $startDate = date('Y'). "/" . date('m') . "/01";
         $endDate = (date('Y') + (date('m') == 12 ? 1 : 0)) . "/" . (date('m') == 12 ? 1 : date('m') + 1) . "/01";
@@ -554,7 +560,8 @@ class AccountStatementsTest extends TestCase
                     'amount' => '1000.00000',
                     'description' => 'Opening Balance',
                     'reference' => '',
-                    'idstatementparent' => ''
+                    'idstatementparent' => '',
+                    'code' => 'BAL'
                 ],
                 [
                     'idaccount' => $idAccount,
@@ -568,7 +575,8 @@ class AccountStatementsTest extends TestCase
                     'amount' => '400.00000',
                     'description' => '',
                     'reference' => '',
-                    'idstatementparent' => ''
+                    'idstatementparent' => '',
+                    'code' => ''
                 ],
                 [
                     'idaccount' => $idAccount,
@@ -582,7 +590,8 @@ class AccountStatementsTest extends TestCase
                     'amount' => '300.00000',
                     'description' => '',
                     'reference' => '',
-                    'idstatementparent' => ''
+                    'idstatementparent' => '',
+                    'code' => ''
                 ],
             ],
             array_map(

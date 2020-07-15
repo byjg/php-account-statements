@@ -2,6 +2,7 @@
 
 namespace Test;
 
+use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
@@ -45,7 +46,7 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 350, 'Test Deposit', 'Referencia Deposit');
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -77,14 +78,14 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->reserveFundsForDeposit($idAccount, -50, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, -50)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
     public function testReserveForDepositFunds_Negative()
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, -200, 1, -400);
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 300, 'Test Deposit', 'Referencia Deposit');
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 300)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -126,7 +127,7 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->addFunds($idAccount, 200, 'Test Deposit', 'Referencia Deposit');
+        $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 200)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         $this->statementBLL->acceptFundsById($idStatement);
     }
@@ -138,8 +139,8 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->addFunds($idAccount, 150, 'Test Deposit', 'Referencia Deposit');
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 350, 'Test Deposit', 'Referencia Deposit');
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Executar ação
         $this->statementBLL->acceptFundsById($idStatement);
@@ -152,8 +153,8 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->addFunds($idAccount, 150, 'Test Deposit', 'Referencia Deposit');
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 350, 'Test Deposit', 'Referencia Deposit');
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Executar ação
         $idActual = $this->statementBLL->acceptFundsById($idStatement);
@@ -186,7 +187,7 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->addFunds($idAccount, 300);
+        $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 300));
 
         $this->statementBLL->rejectFundsById($idStatement);
     }
@@ -198,8 +199,8 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->addFunds($idAccount, 150, 'Test Deposit', 'Referencia Deposit');
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 350, 'Test Deposit', 'Referencia Deposit');
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Executar ação
         $this->statementBLL->rejectFundsById($idStatement);
@@ -212,8 +213,8 @@ class ReserveFundsDepositTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->addFunds($idAccount, 150, 'Test Deposit', 'Referencia Deposit');
-        $idStatement = $this->statementBLL->reserveFundsForDeposit($idAccount, 350, 'Test Deposit', 'Referencia Deposit');
+        $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
+        $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Executar ação
         $idActual = $this->statementBLL->rejectFundsById($idStatement);
