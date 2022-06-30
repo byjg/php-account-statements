@@ -2,6 +2,7 @@
 
 namespace Test;
 
+use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
@@ -45,7 +46,7 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 350)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -76,14 +77,14 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->reserveFundsForWithdraw($idAccount, -50, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, -50)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
     public function testReserveForWithdrawFunds_Negative()
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 1150, 'Test Withdraw', 'Referencia Withdraw');
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 1150)->setDescription('Test Withdraw')->setReference( 'Referencia Withdraw'));
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -114,7 +115,7 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
-        $this->statementBLL->reserveFundsForWithdraw($idAccount, 1401, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
     /**
@@ -135,7 +136,7 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 200, 'Test Withdraw', 'Referencia Withdraw');
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 200)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         $this->statementBLL->acceptFundsById($idStatement);
     }
@@ -147,8 +148,8 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->withdrawFunds($idAccount, 150, 'Test Withdraw', 'Referencia Withdraw');
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 350)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Executar ação
         $this->statementBLL->acceptFundsById($idStatement);
@@ -161,8 +162,8 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->withdrawFunds($idAccount, 150, 'Test Withdraw', 'Referencia Withdraw');
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription( 'Test Withdraw')->setReference('Referencia Withdraw'));
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 350)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Executar ação
         $idActual = $this->statementBLL->acceptFundsById($idStatement);
@@ -206,7 +207,7 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $idStatement = $this->statementBLL->withdrawFunds($idAccount, 300);
+        $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 300));
 
         $this->statementBLL->rejectFundsById($idStatement);
     }
@@ -218,8 +219,8 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->withdrawFunds($idAccount, 150, 'Test Withdraw', 'Referencia Withdraw');
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 350)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Executar ação
         $this->statementBLL->rejectFundsById($idStatement);
@@ -232,8 +233,8 @@ class ReserveFundsWithdrawTest extends TestCase
     {
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
-        $this->statementBLL->withdrawFunds($idAccount, 150, 'Test Withdraw', 'Referencia Withdraw');
-        $idStatement = $this->statementBLL->reserveFundsForWithdraw($idAccount, 350, 'Test Withdraw', 'Referencia Withdraw');
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
+        $idStatement = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 350)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Executar ação
         $idActual = $this->statementBLL->rejectFundsById($idStatement);

@@ -7,6 +7,7 @@
 
 namespace ByJG\AccountStatements\Bll;
 
+use ByJG\AccountStatements\DTO\StatementDTO;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
@@ -148,9 +149,9 @@ class AccountBLL
         }
 
         if ($balance > 0) {
-            $this->statementBLL->addFunds($idAccount, $balance, "Opening Balance");
+            $this->statementBLL->addFunds(StatementDTO::instance($idAccount, $balance)->setDescription("Opening Balance")->setCode('BAL'));
         } elseif ($balance < 0) {
-            $this->statementBLL->withdrawFunds($idAccount, abs($balance), "Opening Balance");
+            $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 
         return $idAccount;
@@ -211,6 +212,7 @@ class AccountBLL
         $statement->setIdAccount($model->getIdAccount());
         $statement->setDescription(empty($description) ? "Reset Balance" : $description);
         $statement->setIdType(StatementEntity::BALANCE);
+        $statement->setCode('BAL');
         $statement->setGrossBalance($newBalance);
         $statement->setNetBalance($newBalance - $unclearedValues);
         $statement->setUnCleared($unclearedValues);
@@ -250,9 +252,9 @@ class AccountBLL
         $amount = $balance - $account->getNetBalance();
 
         if ($amount > 0) {
-            $idStatement = $this->statementBLL->addFunds($idaccount, $amount, $description);
+            $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idaccount, $amount)->setDescription($description));
         } elseif ($amount < 0) {
-            $idStatement = $this->statementBLL->withdrawFunds($idaccount, abs($amount), $description);
+            $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idaccount, abs($amount))->setDescription($description));
         }
 
         return $idStatement;
