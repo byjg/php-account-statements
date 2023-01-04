@@ -24,6 +24,8 @@ class AccountRepository extends BaseRepository
             'idaccount'
         );
 
+        $mapper->addFieldMap("entrydate", "entrydate", function () { return false; }, function () { return false; });
+
         $this->repository = new Repository($dbDriver, $mapper);
     }
 

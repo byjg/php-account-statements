@@ -6,6 +6,8 @@ use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\Serializer\BinderObject;
 use DomainException;
@@ -26,7 +28,7 @@ class ReserveFundsDepositTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbSetUp();
         $this->prepareObjects();
@@ -37,7 +39,7 @@ class ReserveFundsDepositTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dbClear();
     }
@@ -71,11 +73,10 @@ class ReserveFundsDepositTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testReserveForDepositFunds_Invalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, -50)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
@@ -120,11 +121,11 @@ class ReserveFundsDepositTest extends TestCase
 //        $this->statementBLL->acceptFundsById(2);
 //    }
 //
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
-    public function testAcceptFundsById_InvalidType()
+
+public function testAcceptFundsById_InvalidType()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 200)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
@@ -132,11 +133,10 @@ class ReserveFundsDepositTest extends TestCase
         $this->statementBLL->acceptFundsById($idStatement);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testAcceptFundsById_HasParentTransation()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
@@ -180,11 +180,10 @@ class ReserveFundsDepositTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testRejectFundsById_InvalidType()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 300));
@@ -192,11 +191,10 @@ class ReserveFundsDepositTest extends TestCase
         $this->statementBLL->rejectFundsById($idStatement);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testRejectFundsById_HasParentTransation()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));

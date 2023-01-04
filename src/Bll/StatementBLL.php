@@ -39,10 +39,9 @@ class StatementBLL
 
 
     /**
-     * Obtém um Statement por ID.
-     * Se o ID não for passado, então devolve todos os Statements.
+     * Get a Statement By ID.
      *
-     * @param int|string $idStatement Opcional. Se não for passado obtém todos
+     * @param int|string $idStatement Optional. empty, return all all ids.
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
@@ -53,35 +52,35 @@ class StatementBLL
     }
 
     /**
-     * Adiciona fundos a uma conta
+     * Add funds to an account
      *
      * @param StatementDTO $dto
-     * @return int Id do Statement Adicionado
+     * @return int Statement ID
      * @throws AmountException
      * @throws TransactionException
      */
     public function addFunds(StatementDTO $dto)
     {
-        // Validações
+        // Validations
         if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount needs to be greater than zero');
         }
 
-        // Obtem DAL de Account
+        // Get an Account
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
             $account = $this->accountRepository->getById($dto->getIdaccount());
             if (is_null($account) || $account->getIdAccount() == "") {
-                throw new AccountException("addFunds: Account $dto->getIdaccount() not found");
+                throw new AccountException("addFunds: Account " . $dto->getIdaccount() . " not found");
             }
 
-            // Atualiza os valores em Account
+            // Update Values in an account
             $account->setGrossBalance($account->getGrossBalance() + $dto->getAmount());
             $account->setNetBalance($account->getNetBalance() + $dto->getAmount());
             $this->accountRepository->save($account);
 
-            // Adciona uma nova linha com os novos dados.
+            // Add the new line
             $statement = new StatementEntity();
             $statement->setAmount($dto->getAmount());
             $statement->setIdType(StatementEntity::DEPOSIT);
@@ -90,7 +89,7 @@ class StatementBLL
             $statement->setCode($dto->getCode());
             $statement->attachAccount($account);
 
-            // Salva em banco
+            // Save to DB
             $result = $this->statementRepository->save($statement);
 
             $connectionManager->commitTransaction();
@@ -104,17 +103,17 @@ class StatementBLL
     }
 
     /**
-     * Saca fundos de uma conta
+     * Withdraw funds from an account
      *
      * @param StatementDTO $dto
-     * @return int Id do Statement Adicionado
+     * @return int Statement ID
      * @throws AmountException
      * @throws TransactionException
      */
     public function withdrawFunds(StatementDTO $dto)
     {
         if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount needs to be greater than zero');
         }
 
         $connectionManager = new ConnectionManager();
@@ -125,17 +124,17 @@ class StatementBLL
                 throw new AccountException('addFunds: Account not found');
             }
 
-            // Se o valor a ser retirado é negativo, então dá um erro.
+            // Cannot withdraw above the account balance.
             if ($account->getNetBalance() - $dto->getAmount() < $account->getMinValue()) {
-                throw new AmountException('O valor de retirada é maior que o saldo disponível em conta');
+                throw new AmountException('Cannot withdraw above the account balance.');
             }
 
-            // Atualiza os dados
+            // Update balances
             $account->setGrossBalance($account->getGrossBalance() - $dto->getAmount());
             $account->setNetBalance($account->getNetBalance() - $dto->getAmount());
             $this->accountRepository->save($account);
 
-            // Cria o statement
+            // Create the Statement
             $statement = new StatementEntity();
             $statement->setIdAccount($dto->getIdaccount());
             $statement->setAmount($dto->getAmount());
@@ -158,18 +157,18 @@ class StatementBLL
     }
 
     /**
-     * Reserva fundos para serem sacados (abate do valor líquido, mas não do Bruto)
+     * Reserve funds to future withdrawn. It affects the net balance but not the gross balance
      *
      * @param StatementDTO $dto
-     * @return int id do statement adicionado
+     * @return int Statement ID
      * @throws AmountException
      * @throws TransactionException
      */
     public function reserveFundsForWithdraw(StatementDTO $dto)
     {
-        // Validações
+        // Validations
         if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount needs to be greater than zero');
         }
 
         $connectionManager = new ConnectionManager();
@@ -180,17 +179,17 @@ class StatementBLL
                 throw new AccountException('reserveFundsForWithdraw: Account not found');
             }
 
-            // Se o valor a ser retirado é negativo, então dá um erro.
+            // Cannot withdraw above the account balance.
             if ($account->getNetBalance() - $dto->getAmount() < $account->getMinValue()) {
-                throw new AmountException('O valor de retirada é maior que o saldo disponível em conta');
+                throw new AmountException('Cannot withdraw above the account balance.');
             }
 
-            // Atualiza os dados
+            // Update Balance
             $account->setUnCleared($account->getUnCleared() + $dto->getAmount());
             $account->setNetBalance($account->getNetBalance() - $dto->getAmount());
             $this->accountRepository->save($account);
 
-            // Cria o statement
+            // Create Statement
             $statement = new StatementEntity();
             $statement->setIdAccount($dto->getIdaccount());
             $statement->setAmount($dto->getAmount());
@@ -213,10 +212,10 @@ class StatementBLL
     }
 
     /**
-     * Reserva fundos para serem sacados (abate do valor líquido, mas não do Bruto)
+     * Reserve funds to future deposit. Update net balance but not gross balance.
      *
      * @param StatementDTO $dto
-     * @return int id do statement adicionado
+     * @return int Statement ID
      * @throws AmountException
      * @throws TransactionException
      */
@@ -224,7 +223,7 @@ class StatementBLL
     {
         // Validações
         if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount precisa ser maior que zero');
+            throw new AmountException('Amount needs to be greater than zero');
         }
 
         $connectionManager = new ConnectionManager();
@@ -235,12 +234,12 @@ class StatementBLL
                 throw new AccountException('reserveFundsForDeposit: Account not found');
             }
 
-            // Atualiza os dados
+            // Update Balances
             $account->setUnCleared($account->getUnCleared() - $dto->getAmount());
             $account->setNetBalance($account->getNetBalance() + $dto->getAmount());
             $this->accountRepository->save($account);
 
-            // Cria o statement
+            // Create Statement
             $statement = new StatementEntity();
             $statement->setIdAccount($dto->getIdaccount());
             $statement->setAmount($dto->getAmount());
@@ -263,12 +262,12 @@ class StatementBLL
     }
 
     /**
-     * Aceita um fundo bloqueado e retira o montando do bruto.
+     * Accept a reserved fund and update gross balance
      *
      * @param int $statementId
      * @param string $description
      * @param null $code
-     * @return int id do statement gerado
+     * @return int Statement ID
      * @throws TransactionException
      */
     public function acceptFundsById($statementId, $description = null, $code = null)
@@ -281,17 +280,17 @@ class StatementBLL
                 throw new StatementException('acceptFundsById: Statement not found');
             }
 
-            // Verifica se o statement é de um depósito bloqueado.
+            // Validate if statement can be accepted.
             if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
-                throw new StatementException('O Id passado não é de um fundo bloqueado');
+                throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
-            // Verifica se já foi realizado anteriormente esse processo.
+            // Validate if the statement has been already accepted.
             if ($this->statementRepository->getByIdParent($statementId) != null) {
-                throw new StatementException('O Id passado já possui uma transação associada');
+                throw new StatementException('The statement has been accepted already');
             }
 
-            // Obtém os dados de account e faz os ajustes
+            // Get values and apply the updates
             $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? 1 : -1;
 
             $account = $this->accountRepository->getById($statement->getIdAccount());
@@ -300,7 +299,7 @@ class StatementBLL
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
-            // Atualiza os dados
+            // Update data
             $statement->setIdStatementParent($statement->getIdStatement());
             $statement->setIdStatement(null); // Poder criar um novo registro
             $statement->setDate(null);
@@ -314,8 +313,6 @@ class StatementBLL
             }
             $result = $this->statementRepository->save($statement);
 
-            // Cria o statement
-
             $connectionManager->commitTransaction();
 
             return $result->getIdStatement();
@@ -327,12 +324,12 @@ class StatementBLL
     }
 
     /**
-     * Rejeita um fundo bloqueado, devolvendo o montante para o valor líquido
+     * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
      * @param string $description
      * @param null $code
-     * @return int id do statement adicionado
+     * @return int Statement ID
      * @throws TransactionException
      */
     public function rejectFundsById($statementId, $description = null, $code = null)
@@ -345,17 +342,17 @@ class StatementBLL
                 throw new StatementException('acceptFundsById: Statement not found');
             }
 
-            // Verifica se o statement é de um depósito bloqueado.
+            // Validate if statement can be accepted.
             if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
-                throw new StatementException('O Id passado não é de um fundo bloqueado');
+                throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
-            // Verifica se já foi realizado anteriormente esse processo.
+            // Validate if the statement has been already accepted.
             if ($this->statementRepository->getByIdParent($statementId) != null) {
-                throw new StatementException('O Id passado já possui uma trnasação associada');
+                throw new StatementException('The statement has been accepted already');
             }
 
-            // Obtém os dados de account e faz os ajustes
+            // Update Account
             $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? -1 : +1;
 
             $account = $this->accountRepository->getById($statement->getIdAccount());
@@ -364,7 +361,7 @@ class StatementBLL
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
-            // Atualiza os dados
+            // Update Statement
             $statement->setIdStatementParent($statement->getIdStatement());
             $statement->setIdStatement(null); // Poder criar um novo registro
             $statement->setDate(null);
@@ -378,8 +375,6 @@ class StatementBLL
             }
             $result = $this->statementRepository->save($statement);
 
-            // Cria o statement
-
             $connectionManager->commitTransaction();
 
             return $result->getIdStatement();
@@ -391,7 +386,7 @@ class StatementBLL
     }
 
     /**
-     * Obtém todas as transações que estão bloqueadas
+     * Update all blocked (reserved) transactions
      *
      * @param int $idAccount
      * @return StatementEntity[]
@@ -409,7 +404,7 @@ class StatementBLL
     }
 
     /**
-     * Obtém todas as transações que estão bloqueadas
+     * This statement is blocked (reserved)
      *
      * @param int $idStatement
      * @return bool

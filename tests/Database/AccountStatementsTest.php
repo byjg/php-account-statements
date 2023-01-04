@@ -6,8 +6,10 @@ use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\Serializer\BinderObject;
+use ByJG\Serializer\SerializerObject;
 use DomainException;
 use InvalidArgumentException;
 use OutOfRangeException;
@@ -26,7 +28,7 @@ class AccountStatementsTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbSetUp();
         $this->prepareObjects();
@@ -37,7 +39,7 @@ class AccountStatementsTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dbClear();
     }
@@ -72,7 +74,7 @@ class AccountStatementsTest extends TestCase
                     'name' => 'Test 1'
                 ],
             ],
-            BinderObject::toArrayFrom($list)
+            SerializerObject::instance($list)->serialize()
         );
 
         $dto = $this->accountTypeBLL->getById('USDTEST');
@@ -211,11 +213,10 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testAddFunds_Invalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
@@ -251,11 +252,10 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testWithdrawFunds_Invalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
@@ -291,11 +291,10 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testWithdrawFunds_NegativeInvalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
@@ -510,21 +509,22 @@ class AccountStatementsTest extends TestCase
         $statement = $this->statementBLL->getById($idStatement)->toArray();
         unset($statement["date"]);
 
-        $this->assertEquals([
-            'idaccount' => $idAccount,
-            'idaccounttype' => 'USDTEST',
-            'grossbalance' => '0.00000',
-            'uncleared' => '0.00000',
-            'netbalance' => '0.00000',
-            'price' => '0.00000',
-            'idstatement' => $idStatement,
-            'idtype' => 'B',
-            'amount' => '0.00000',
-            'description' => 'Reset Balance',
-            'idstatementparent' => '',
-            'reference' => '',
-            'code' => 'BAL'
-        ],
+        $this->assertEquals(
+            [
+                'idaccount' => $idAccount,
+                'idaccounttype' => 'USDTEST',
+                'grossbalance' => '0.00000',
+                'uncleared' => '0.00000',
+                'netbalance' => '0.00000',
+                'price' => '0.00000',
+                'idstatement' => $idStatement,
+                'idtype' => 'B',
+                'amount' => '0.00000',
+                'description' => 'Reset Balance',
+                'idstatementparent' => '',
+                'reference' => '',
+                'code' => 'BAL'
+            ],
             $statement
         );
 

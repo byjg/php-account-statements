@@ -6,6 +6,8 @@ use ByJG\AccountStatements\DTO\StatementDTO;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\Serializer\BinderObject;
 use DomainException;
@@ -26,7 +28,7 @@ class ReserveFundsWithdrawTest extends TestCase
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->dbSetUp();
         $this->prepareObjects();
@@ -37,7 +39,7 @@ class ReserveFundsWithdrawTest extends TestCase
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->dbClear();
     }
@@ -70,11 +72,10 @@ class ReserveFundsWithdrawTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testReserveForWithdrawFunds_Invalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, -50)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
@@ -108,32 +109,29 @@ class ReserveFundsWithdrawTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\AmountException
-     */
     public function testReserveForWithdrawFunds_NegativeInvalid()
     {
+        $this->expectException(AmountException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
         $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($idAccount, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testAcceptFundsById_InvalidId()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
         $this->statementBLL->acceptFundsById(2);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testAcceptFundsById_InvalidType()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 200)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
@@ -141,11 +139,10 @@ class ReserveFundsWithdrawTest extends TestCase
         $this->statementBLL->acceptFundsById($idStatement);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testAcceptFundsById_HasParentTransation()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
@@ -189,22 +186,20 @@ class ReserveFundsWithdrawTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testRejectFundsById_InvalidId()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $this->accountBLL->createAccount('USDTEST', -1, 1000);
 
         $this->statementBLL->rejectFundsById(5);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testRejectFundsById_InvalidType()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 300));
@@ -212,11 +207,10 @@ class ReserveFundsWithdrawTest extends TestCase
         $this->statementBLL->rejectFundsById($idStatement);
     }
 
-    /**
-     * @expectedException \ByJG\AccountStatements\Exception\StatementException
-     */
     public function testRejectFundsById_HasParentTransation()
     {
+        $this->expectException(StatementException::class);
+
         // Populate Data!
         $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));

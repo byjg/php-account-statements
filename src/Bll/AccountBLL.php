@@ -55,10 +55,9 @@ class AccountBLL
 
 
     /**
-     * Obtém um Account pelo seu ID.
-     * Se o ID não for passado, então devolve todos os Accounts.
+     * Get an account by ID.
      *
-     * @param int $idAccount Opcional. Se não for passado obtém todos
+     * @param int $idAccount Optional id empty return all. 
      * @return AccountEntity|AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
@@ -70,7 +69,7 @@ class AccountBLL
     }
 
     /**
-     * Obtém uma lista  AccountEntity pelo Id do Usuário
+     * Obtém uma lista AccountEntity pelo Id do Usuário
      *
      * @param int $idUser
      * @param string $accountType Tipo de conta
