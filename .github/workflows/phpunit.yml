@@ -40,7 +40,7 @@ jobs:
           --health-retries=10
 
     env:
-      MYSQL_TEST_HOST: mysql-container
+      MYSQL_TEST_URI: "mysql://root:password@mysql/accounttest"
       
     steps:
       - uses: actions/checkout@v2

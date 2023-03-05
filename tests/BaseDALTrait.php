@@ -66,7 +66,8 @@ trait BaseDALTrait
      */
     public function dbSetUp()
     {
-        $this->uri = new Uri("mysql://root:password@127.0.0.1/accounttest");
+        $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:password@127.0.0.1/accounttest";
+        $this->uri = new Uri($uriMySqlTest);
         
         $migration = new Migration($this->uri, __DIR__ . "/../db");
         $migration->registerDatabase("mysql", MySqlDatabase::class);
