@@ -60,7 +60,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "USDTEST",
-                "iduser" => -10,
+                "iduser" => "___TESTUSER-10",
                 "balance" => 1000,
                 "price" => 1,
                 "extra" => "Extra Information",
@@ -80,7 +80,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 0,
             "netbalance" => 1000,
@@ -115,7 +115,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 300,
             "uncleared" => 0,
             "netbalance" => 300,
@@ -152,7 +152,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 600,
             "uncleared" => 0,
             "netbalance" => 600,
@@ -182,7 +182,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 0,
             "uncleared" => 0,
             "netbalance" => 0,
@@ -213,7 +213,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "USDTEST",
-                "iduser"        => -10,
+                "iduser"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -246,7 +246,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 1150,
             "uncleared" => 0,
             "netbalance" => 1150,
@@ -302,7 +302,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "USDTEST",
-                "iduser"        => -10,
+                "iduser"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -335,7 +335,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 850,
             "uncleared" => 0,
             "netbalance" => 850,
@@ -392,7 +392,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "USDTEST",
-                "iduser"        => -10,
+                "iduser"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -443,7 +443,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 400,
             "netbalance" => 600,
@@ -547,7 +547,7 @@ class RestCallTestA extends SwaggerTestCase
         $expectedAccount = [
             "idaccount" => $result['idaccount'],
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 750,
             "uncleared" => 0,
             "netbalance" => 750,
@@ -626,7 +626,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "USDTEST",
-                "iduser"        => -10,
+                "iduser"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -647,7 +647,7 @@ class RestCallTestA extends SwaggerTestCase
             [
                 "idaccount" => $account["idaccount"],
                 "idaccounttype" => "USDTEST",
-                "iduser" => -10,
+                "iduser" => "___TESTUSER-10",
                 "grossbalance" => 1000,
                 "uncleared" => 0,
                 "netbalance" => 1000,
@@ -677,7 +677,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withMethod('POST')
             ->withRequestBody([
                 "idaccounttype" => "ABCTEST",
-                "iduser"        => -10,
+                "iduser"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -698,7 +698,7 @@ class RestCallTestA extends SwaggerTestCase
             [
                 "idaccount" => $account["idaccount"],
                 "idaccounttype" => "ABCTEST",
-                "iduser" => -10,
+                "iduser" => "___TESTUSER-10",
                 "grossbalance" => 1000,
                 "uncleared" => 0,
                 "netbalance" => 1000,

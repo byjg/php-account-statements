@@ -71,7 +71,7 @@ class AccountBLL
     /**
      * Obtém uma lista AccountEntity pelo Id do Usuário
      *
-     * @param int $idUser
+     * @param string $idUser
      * @param string $accountType Tipo de conta
      * @return AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
@@ -101,7 +101,7 @@ class AccountBLL
      * Cria uma nova conta no sistema
      *
      * @param string $idAccountType
-     * @param int $idUser
+     * @param string $idUser
      * @param float $balance
      * @param float|int $price
      * @param int $minValue

@@ -85,7 +85,7 @@ class AccountStatementsTest extends TestCase
     public function testGetById()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 10)->setDescription( 'Test')->setReference('Referencia')->setCode('XYZ'));
 
         // Objeto que é esperado
@@ -120,7 +120,7 @@ class AccountStatementsTest extends TestCase
     public function testGetAll()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 10)->setDescription( 'Test')->setReference('Referencia'));
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 50)->setDescription('Test')->setReference('Referencia'));
 
@@ -189,7 +189,7 @@ class AccountStatementsTest extends TestCase
     public function testAddFunds()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 250)->setDescription('Test Add Funds')->setReference('Referencia Add Funds'));
 
         // Check
@@ -218,7 +218,7 @@ class AccountStatementsTest extends TestCase
         $this->expectException(AmountException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check;
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, -15));
@@ -227,7 +227,7 @@ class AccountStatementsTest extends TestCase
     public function testWithdrawFunds()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 350)->setDescription( 'Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Objeto que é esperado
@@ -257,7 +257,7 @@ class AccountStatementsTest extends TestCase
         $this->expectException(AmountException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, -15));
@@ -266,7 +266,7 @@ class AccountStatementsTest extends TestCase
     public function testWithdrawFunds_Negative()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
         $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 1150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
 
         // Objeto que é esperado
@@ -296,7 +296,7 @@ class AccountStatementsTest extends TestCase
         $this->expectException(AmountException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000, 1, -400);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
@@ -314,20 +314,20 @@ class AccountStatementsTest extends TestCase
     {
         $accountId = $this->accountBLL->createAccount(
             'USDTEST',
-            -10,
+            "___TESTUSER-10",
             1000,
             1,
             0,
             'Extra Information'
         );
 
-        $account = $this->accountBLL->getUserId(-10);
+        $account = $this->accountBLL->getUserId("___TESTUSER-10");
         $account[0]->setEntryDate(null);
 
         $accountEntity = new AccountEntity([
             "idaccount" => $accountId,
             "idaccounttype" => "USDTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 0,
             "netbalance" => 1000,
@@ -356,7 +356,7 @@ class AccountStatementsTest extends TestCase
     {
         $accountId = $this->accountBLL->createAccount(
             'ABCTEST',
-            -10,
+            "___TESTUSER-10",
             1000,
             1,
             0,
@@ -369,7 +369,7 @@ class AccountStatementsTest extends TestCase
         $accountEntity = new AccountEntity([
             "idaccount" => $accountId,
             "idaccounttype" => "ABCTEST",
-            "iduser" => -10,
+            "iduser" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 0,
             "netbalance" => 1000,
@@ -387,7 +387,7 @@ class AccountStatementsTest extends TestCase
     public function testOverrideFunds()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         $idStatement = $this->accountBLL->overrideBalance($idAccount, 650);
         $account = $this->accountBLL->getById($idAccount)->toArray();
@@ -397,7 +397,7 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals([
                 'idaccount' => $idAccount,
                 'idaccounttype' => 'USDTEST',
-                'iduser' => '-1',
+                'iduser' => "___TESTUSER-1",
                 'grossbalance' => '650.00000',
                 'uncleared' => '0.00000',
                 'netbalance' => '650.00000',
@@ -433,7 +433,7 @@ class AccountStatementsTest extends TestCase
     public function testPartialFunds()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         $idStatement = $this->accountBLL->partialBalance($idAccount, 650);
         $account = $this->accountBLL->getById($idAccount)->toArray();
@@ -443,7 +443,7 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals([
                 'idaccount' => $idAccount,
                 'idaccounttype' => 'USDTEST',
-                'iduser' => '-1',
+                'iduser' => "___TESTUSER-1",
                 'grossbalance' => '650.00000',
                 'uncleared' => '0.00000',
                 'netbalance' => '650.00000',
@@ -480,7 +480,7 @@ class AccountStatementsTest extends TestCase
     public function testCloseAccount()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 400));
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 200));
@@ -495,7 +495,7 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals([
             'idaccount' => $idAccount,
             'idaccounttype' => 'USDTEST',
-            'iduser' => '-1',
+            'iduser' => "___TESTUSER-1",
             'grossbalance' => '0.00000',
             'uncleared' => '0.00000',
             'netbalance' => '0.00000',
@@ -533,11 +533,11 @@ class AccountStatementsTest extends TestCase
     public function testGetByDate()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 400));
         $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, 300));
 
-        $ignore = $this->accountBLL->createAccount('BRLTEST', -999, 1000); // I dont want this account
+        $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
         $this->statementBLL->addFunds(StatementDTO::instance($ignore, 200));
 
         $startDate = date('Y'). "/" . date('m') . "/01";

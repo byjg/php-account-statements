@@ -47,7 +47,7 @@ class ReserveFundsDepositTest extends TestCase
     public function testReserveForDepositFunds()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Objeto que é esperado
@@ -78,14 +78,14 @@ class ReserveFundsDepositTest extends TestCase
         $this->expectException(AmountException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, -50)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
     }
 
     public function testReserveForDepositFunds_Negative()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, -200, 1, -400);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", -200, 1, -400);
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 300)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         // Objeto que é esperado
@@ -116,7 +116,7 @@ class ReserveFundsDepositTest extends TestCase
 //    public function testAcceptFundsById_InvalidId()
 //    {
 //        // Populate Data!
-//        $this->accountBLL->createAccount('USDTEST', -1, 1000);
+//        $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 //
 //        $this->statementBLL->acceptFundsById(2);
 //    }
@@ -127,7 +127,7 @@ public function testAcceptFundsById_InvalidType()
         $this->expectException(StatementException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 200)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
         $this->statementBLL->acceptFundsById($idStatement);
@@ -138,7 +138,7 @@ public function testAcceptFundsById_InvalidType()
         $this->expectException(StatementException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
@@ -152,7 +152,7 @@ public function testAcceptFundsById_InvalidType()
     public function testAcceptFundsById_OK()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
@@ -185,7 +185,7 @@ public function testAcceptFundsById_InvalidType()
         $this->expectException(StatementException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 300));
 
         $this->statementBLL->rejectFundsById($idStatement);
@@ -196,7 +196,7 @@ public function testAcceptFundsById_InvalidType()
         $this->expectException(StatementException::class);
 
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 
@@ -210,7 +210,7 @@ public function testAcceptFundsById_InvalidType()
     public function testRejectFundsById_OK()
     {
         // Populate Data!
-        $idAccount = $this->accountBLL->createAccount('USDTEST', -1, 1000);
+        $idAccount = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(StatementDTO::instance($idAccount, 150)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
         $idStatement = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($idAccount, 350)->setDescription('Test Deposit')->setReference('Referencia Deposit'));
 

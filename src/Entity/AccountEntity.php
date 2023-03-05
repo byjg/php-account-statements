@@ -27,7 +27,7 @@ class AccountEntity extends BaseModel
     protected $idaccounttype;
 
     /**
-     * @var int
+     * @var string
      * @SWG\Property()
      */
     protected $iduser;

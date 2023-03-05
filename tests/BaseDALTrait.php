@@ -89,15 +89,15 @@ trait BaseDALTrait
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            'WHERE account.idaccount = statement.idaccount and account.iduser < 0 and idstatementparent is not null;'
+            "WHERE account.idaccount = statement.idaccount and account.iduser like '___TESTUSER-%' and idstatementparent is not null;"
         );
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            'WHERE account.idaccount = statement.idaccount and account.iduser < 0'
+            "WHERE account.idaccount = statement.idaccount and account.iduser like '___TESTUSER-%'"
         );
 
-        $this->dbDriver->execute('DELETE FROM `account` where account.iduser < 0');
+        $this->dbDriver->execute("DELETE FROM `account` where account.iduser like '___TESTUSER-%'");
 
         $this->dbDriver->execute("DELETE FROM `accounttype` WHERE idaccounttype like '___TEST'");
     }
@@ -130,6 +130,6 @@ trait BaseDALTrait
         $this->accountTypeBLL->update($dto2);
         $this->accountTypeBLL->update($dto3);
 
-        $this->accountBLL->createAccount('BRLTEST', -1, 1000, 1);
+        $this->accountBLL->createAccount('BRLTEST', '___TESTUSER-1', 1000, 1);
     }
 }
