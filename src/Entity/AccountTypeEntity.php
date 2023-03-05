@@ -5,7 +5,7 @@ namespace ByJG\AccountStatements\Entity;
 use ByJG\Serializer\BaseModel;
 
 /**
- * @SWG\Definition(
+ * @OA\Definition(
  *   description="AccountType",
  * )
  *
@@ -16,13 +16,13 @@ class AccountTypeEntity extends BaseModel
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idaccounttype;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $name;
     

@@ -6,7 +6,7 @@ use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\Serializer\BaseModel;
 
 /**
- * @SWG\Definition(
+ * @OA\Definition(
  *   description="Statement",
  * )
  *
@@ -24,85 +24,85 @@ class StatementEntity extends BaseModel
 
     /**
      * @var int
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idstatement;
 
     /**
      * @var int
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idaccount;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idtype;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $amount;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $price;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $date;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $grossbalance;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $uncleared;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $netbalance;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $code;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $description;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idstatementparent;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $reference;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idaccounttype;
 

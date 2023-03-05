@@ -6,7 +6,7 @@ use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\Serializer\BaseModel;
 
 /**
- * @SWG\Definition(
+ * @OA\Definition(
  *   description="Account",
  * )
  *
@@ -16,61 +16,61 @@ class AccountEntity extends BaseModel
 {
     /**
      * @var int
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idaccount;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $idaccounttype;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $iduser;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $grossbalance;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $uncleared;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $netbalance;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $price;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $extra;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $entrydate;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $minvalue;
 
