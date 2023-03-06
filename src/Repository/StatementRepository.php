@@ -21,7 +21,7 @@ class StatementRepository extends BaseRepository
         $mapper = new Mapper(
             StatementEntity::class,
             'statement',
-            'idstatement'
+            'statementid'
         );
 
         $mapper->addFieldMap("date", "date", function () { return false; }, function () { return false; });
@@ -32,17 +32,17 @@ class StatementRepository extends BaseRepository
     /**
      * Obtém um Statement pelo seu ID.
      *
-     * @param int $idParent
+     * @param int $parentId
      * @param bool $forUpdate
      * @return StatementEntity
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getByIdParent($idParent, $forUpdate = false)
+    public function getByIdParent($parentId, $forUpdate = false)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
-            ->where('idstatementparent = :id', ['id' => $idParent])
+            ->where('statementparentid = :id', ['id' => $parentId])
         ;
 
         if ($forUpdate) {
@@ -59,17 +59,17 @@ class StatementRepository extends BaseRepository
     }
 
     /**
-     * @param int $idAccount
+     * @param int $accountId
      * @param int $limit
      * @return StatementEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getByAccountId($idAccount, $limit = 20)
+    public function getByAccountId($accountId, $limit = 20)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
-            ->where("idaccount = :id", ["id" => $idAccount])
+            ->where("accountid = :id", ["id" => $accountId])
             ->limit(0, $limit)
         ;
 
@@ -77,45 +77,45 @@ class StatementRepository extends BaseRepository
     }
 
     /**
-     * @param null $idaccount
+     * @param null $accountId
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUnclearedStatements($idaccount = null)
+    public function getUnclearedStatements($accountId = null)
     {
         $query = Query::getInstance()
             ->fields([
                 "st1.*",
-                "ac.idaccounttype",
+                "ac.accounttypeid",
             ])
             ->table($this->repository->getMapper()->getTable() . " st1")
-            ->join("account ac", "st1.idaccount = ac.idaccount")
-            ->leftJoin("statement st2", "st1.idstatement = st2.idstatementparent")
-            ->where("st1.idtype in ('WB', 'DB')")
-            ->where("st2.idstatement is null")
+            ->join("account ac", "st1.accountid = ac.accountid")
+            ->leftJoin("statement st2", "st1.statementid = st2.statementparentid")
+            ->where("st1.typeid in ('WB', 'DB')")
+            ->where("st2.statementid is null")
             ->orderBy(["st1.date desc"])
         ;
 
-        if (!empty($idaccount)) {
-            $query->where("st1.idaccount = :id", ["id" => $idaccount]);
+        if (!empty($accountId)) {
+            $query->where("st1.accountid = :id", ["id" => $accountId]);
         }
 
         return $this->repository->getByQuery($query);
     }
 
     /**
-     * @param null $idaccount
+     * @param null $accountId
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getByDate($idaccount, $startDate, $endDate)
+    public function getByDate($accountId, $startDate, $endDate)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
             ->where("date between :start and :end", ["start" => $startDate, "end" => $endDate])
-            ->where("idaccount = :id", ["id" => $idaccount])
+            ->where("accountid = :id", ["id" => $accountId])
             ->orderBy(["date"])
         ;
 

@@ -23,9 +23,9 @@ DROP TABLE IF EXISTS `account`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `account` (
-  `idaccount` int(11) NOT NULL AUTO_INCREMENT,
-  `idaccounttype` varchar(20) COLLATE utf8_bin NOT NULL,
-  `iduser` int(11) NOT NULL,
+  `accountid` int(11) NOT NULL AUTO_INCREMENT,
+  `accounttypeid` varchar(20) COLLATE utf8_bin NOT NULL,
+  `userid` int(11) NOT NULL,
   `grossbalance` decimal(15,5) DEFAULT '0.00000',
   `uncleared` decimal(15,5) DEFAULT '0.00000',
   `netbalance` decimal(15,5) DEFAULT '0.00000',
@@ -33,10 +33,10 @@ CREATE TABLE `account` (
   `extra` text COLLATE utf8_bin,
   `minvalue` decimal(15,5) NOT NULL DEFAULT '0.00000',
   `entrydate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`idaccount`),
-  UNIQUE KEY `unique_userid_type` (`iduser`,`idaccounttype`),
-  KEY `fk_account_accounttype_idx` (`idaccounttype`),
-  CONSTRAINT `fk_account_accounttype` FOREIGN KEY (`idaccounttype`) REFERENCES `accounttype` (`idaccounttype`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`accountid`),
+  UNIQUE KEY `unique_userid_type` (`userid`,`accounttypeid`),
+  KEY `fk_account_accounttype_idx` (`accounttypeid`),
+  CONSTRAINT `fk_account_accounttype` FOREIGN KEY (`accounttypeid`) REFERENCES `accounttype` (`accounttypeid`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -48,9 +48,9 @@ DROP TABLE IF EXISTS `accounttype`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `accounttype` (
-  `idaccounttype` varchar(20) COLLATE utf8_bin NOT NULL,
+  `accounttypeid` varchar(20) COLLATE utf8_bin NOT NULL,
   `name` varchar(45) COLLATE utf8_bin NOT NULL,
-  PRIMARY KEY (`idaccounttype`)
+  PRIMARY KEY (`accounttypeid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -62,10 +62,10 @@ DROP TABLE IF EXISTS `statement`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `statement` (
-  `idstatement` int(11) NOT NULL AUTO_INCREMENT,
-  `idaccount` int(11) NOT NULL,
-  `idaccounttype` varchar(20) COLLATE utf8_bin NOT NULL,
-  `idtype` enum('B','D','W','DB','WB','R') COLLATE utf8_bin NOT NULL COMMENT 'B: Balance - Inicia um novo valor desprezando os antigos\nD: Deposit: Adiciona um valor imediatamente ao banco\nW: Withdrawal\nR: Reject\nWD: Withdrawal (blocked, uncleared)\n',
+  `statementid` int(11) NOT NULL AUTO_INCREMENT,
+  `accountid` int(11) NOT NULL,
+  `accounttypeid` varchar(20) COLLATE utf8_bin NOT NULL,
+  `typeid` enum('B','D','W','DB','WB','R') COLLATE utf8_bin NOT NULL COMMENT 'B: Balance - Inicia um novo valor desprezando os antigos\nD: Deposit: Adiciona um valor imediatamente ao banco\nW: Withdrawal\nR: Reject\nWD: Withdrawal (blocked, uncleared)\n',
   `amount` decimal(15,5) NOT NULL,
   `price` decimal(15,5) DEFAULT '1.00000',
   `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -73,16 +73,16 @@ CREATE TABLE `statement` (
   `uncleared` decimal(15,5) DEFAULT NULL,
   `netbalance` decimal(15,5) DEFAULT NULL,
   `description` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `idstatementparent` int(11) DEFAULT NULL,
+  `statementparentid` int(11) DEFAULT NULL,
   `reference` varchar(45) COLLATE utf8_bin DEFAULT NULL,
-  PRIMARY KEY (`idstatement`),
-  KEY `fk_statement_account1_idx` (`idaccount`),
-  KEY `fk_statement_statement1_idx` (`idstatementparent`),
-  KEY `idx_statement_idtype_date` (`idtype`,`date`) USING BTREE COMMENT 'Índice para filtros com tipo e ordenação por data decrescente',
-  KEY `fk_statement_accounttype_idx` (`idaccounttype`),
-  CONSTRAINT `fk_statement_accounttype` FOREIGN KEY (`idaccounttype`) REFERENCES `accounttype` (`idaccounttype`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_statement_account1` FOREIGN KEY (`idaccount`) REFERENCES `account` (`idaccount`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_statement_statement1` FOREIGN KEY (`idstatementparent`) REFERENCES `statement` (`idstatement`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  PRIMARY KEY (`statementid`),
+  KEY `fk_statement_account1_idx` (`accountid`),
+  KEY `fk_statement_statement1_idx` (`statementparentid`),
+  KEY `idx_statement_typeid_date` (`typeid`,`date`) USING BTREE COMMENT 'Índice para filtros com tipo e ordenação por data decrescente',
+  KEY `fk_statement_accounttype_idx` (`accounttypeid`),
+  CONSTRAINT `fk_statement_accounttype` FOREIGN KEY (`accounttypeid`) REFERENCES `accounttype` (`accounttypeid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_statement_account1` FOREIGN KEY (`accountid`) REFERENCES `account` (`accountid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_statement_statement1` FOREIGN KEY (`statementparentid`) REFERENCES `statement` (`statementid`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

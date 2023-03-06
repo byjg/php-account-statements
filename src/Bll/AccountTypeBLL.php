@@ -28,14 +28,14 @@ class AccountTypeBLL
      * Obtém um AccountType por ID.
      * Se o ID não for passado, então devolve todos os AccountTypes.
      *
-     * @param int|string $idAccountType Opcional. Se não for passado obtém todos
+     * @param int|string $accountTypeId Opcional. Se não for passado obtém todos
      * @return AccountTypeEntity|AccountTypeEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getById($idAccountType)
+    public function getById($accountTypeId)
     {
-        return $this->accountTypeRepository->getById($idAccountType);
+        return $this->accountTypeRepository->getById($accountTypeId);
     }
 
     /**
@@ -52,9 +52,9 @@ class AccountTypeBLL
     public function update($data)
     {
         $object = new AccountTypeEntity($data);
-        $idAccountType = $object->getIdAccountType();
+        $accountTypeId = $object->getAccountTypeId();
 
-        if (empty($object->getIdAccountType())) {
+        if (empty($object->getAccountTypeId())) {
             throw new AccountTypeException('Id account type não pode ser em branco');
         }
 
@@ -64,7 +64,7 @@ class AccountTypeBLL
 
         $this->accountTypeRepository->save($object);
 
-        return $idAccountType;
+        return $accountTypeId;
     }
 
     public function getRepository()

@@ -6,7 +6,7 @@ namespace ByJG\AccountStatements\DTO;
 
 class StatementDTO
 {
-    protected $idaccount;
+    protected $accountId;
     protected $amount;
 
     protected $description = null;
@@ -15,26 +15,26 @@ class StatementDTO
 
     /**
      * StatementDTO constructor.
-     * @param $idaccount
+     * @param $accountId
      * @param $amount
      */
-    public function __construct($idaccount, $amount)
+    public function __construct($accountId, $amount)
     {
-        $this->idaccount = $idaccount;
+        $this->accountid = $accountId;
         $this->amount = $amount;
     }
 
-    public static function instance($idaccount, $amount)
+    public static function instance($accountId, $amount)
     {
-        return new StatementDTO($idaccount, $amount);
+        return new StatementDTO($accountId, $amount);
     }
 
     /**
      * @return mixed
      */
-    public function getIdaccount()
+    public function getaccountId()
     {
-        return $this->idaccount;
+        return $this->accountid;
     }
 
     /**

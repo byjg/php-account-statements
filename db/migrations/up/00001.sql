@@ -1,2 +1,2 @@
 ALTER TABLE `account`
-CHANGE COLUMN `iduser` `iduser` varchar(50) NULL ;
+CHANGE COLUMN `userid` `userid` varchar(50) NULL ;

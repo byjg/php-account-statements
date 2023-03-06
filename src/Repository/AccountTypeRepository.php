@@ -19,7 +19,7 @@ class AccountTypeRepository extends BaseRepository
         $mapper = new Mapper(
             AccountTypeEntity::class,
             'accounttype',
-            'idaccounttype'
+            'accounttypeid'
         );
 
         $this->repository = new Repository($dbDriver, $mapper);

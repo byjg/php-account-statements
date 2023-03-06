@@ -89,17 +89,17 @@ trait BaseDALTrait
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            "WHERE account.idaccount = statement.idaccount and account.iduser like '___TESTUSER-%' and idstatementparent is not null;"
+            "WHERE account.accountid = statement.accountid and account.userid like '___TESTUSER-%' and statementparentid is not null;"
         );
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            "WHERE account.idaccount = statement.idaccount and account.iduser like '___TESTUSER-%'"
+            "WHERE account.accountid = statement.accountid and account.userid like '___TESTUSER-%'"
         );
 
-        $this->dbDriver->execute("DELETE FROM `account` where account.iduser like '___TESTUSER-%'");
+        $this->dbDriver->execute("DELETE FROM `account` where account.userid like '___TESTUSER-%'");
 
-        $this->dbDriver->execute("DELETE FROM `accounttype` WHERE idaccounttype like '___TEST'");
+        $this->dbDriver->execute("DELETE FROM `accounttype` WHERE accounttypeid like '___TEST'");
     }
 
     /**
@@ -115,15 +115,15 @@ trait BaseDALTrait
     protected function createDummyData()
     {
         $dto1 = new AccountTypeEntity();
-        $dto1->setIdAccountType('USDTEST');
+        $dto1->setAccountTypeId('USDTEST');
         $dto1->setName('Test 1');
 
         $dto2 = new AccountTypeEntity();
-        $dto2->setIdAccountType('BRLTEST');
+        $dto2->setAccountTypeId('BRLTEST');
         $dto2->setName('Test 2');
 
         $dto3 = new AccountTypeEntity();
-        $dto3->setIdAccountType('ABCTEST');
+        $dto3->setAccountTypeId('ABCTEST');
         $dto3->setName('Test 3');
 
         $this->accountTypeBLL->update($dto1);

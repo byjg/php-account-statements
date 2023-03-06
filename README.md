@@ -41,7 +41,7 @@ $accountBLL = new AccountBLL($accountRepo, $accountTypeBLL, $statementBLL);
 
 // Create a new Account Type
 $accountType = new AccountTypeEntity();
-$accountType->setIdAccountType('USD');
+$accountType->setAccountTypeId('USD');
 $accountType->setName('Dollar Account');
 
 $accountTypeBLL = new AccountTypeBLL($accountTypeRepo);
@@ -49,7 +49,7 @@ $accountTypeBLL->update($accountType);
 
 // Create a new Account
 $accountRepo = new AccountRepository($this->dbDriver);
-$accountId = $accountBLL->createAccount($accountType->getIdAccountType(), '34', 0);
+$accountId = $accountBLL->createAccount($accountType->getAccountTypeId(), '34', 0);
 
 // Add 200 USD to the account
 $statement = new StatementDTO($accountId, 200);

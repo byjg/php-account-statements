@@ -21,7 +21,7 @@ class AccountRepository extends BaseRepository
         $mapper = new Mapper(
             AccountEntity::class,
             'account',
-            'idaccount'
+            'accountid'
         );
 
         $mapper->addFieldMap("entrydate", "entrydate", function () { return false; }, function () { return false; });
@@ -30,21 +30,21 @@ class AccountRepository extends BaseRepository
     }
 
     /**
-     * @param $idUser
+     * @param $userId
      * @param string $accountType
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUserId($idUser, $accountType = "")
+    public function getUserId($userId, $accountType = "")
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
-            ->where('iduser = :iduser', ['iduser' => $idUser])
+            ->where('userid = :userid', ['userid' => $userId])
         ;
 
         if (!empty($accountType)) {
-            $query->where("idaccounttype = :acctype", ["acctype" => $accountType]);
+            $query->where("accounttypeid = :acctype", ["acctype" => $accountType]);
         }
 
         return $this->repository
@@ -52,16 +52,16 @@ class AccountRepository extends BaseRepository
     }
 
     /**
-     * @param $idAccountType
+     * @param $accountTypeId
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getAccountTypeId($idAccountType)
+    public function getAccountTypeId($accountTypeId)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
-            ->where("idaccounttype = :acctype", ["acctype" => $idAccountType])
+            ->where("accounttypeid = :acctype", ["acctype" => $accountTypeId])
         ;
 
 

@@ -26,19 +26,19 @@ class StatementEntity extends BaseModel
      * @var int
      * @OA\Property()
      */
-    protected $idstatement;
+    protected $statementid;
 
     /**
      * @var int
      * @OA\Property()
      */
-    protected $idaccount;
+    protected $accountid;
 
     /**
      * @var string
      * @OA\Property()
      */
-    protected $idtype;
+    protected $typeid;
 
     /**
      * @var float
@@ -92,7 +92,7 @@ class StatementEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
-    protected $idstatementparent;
+    protected $statementparentid;
 
     /**
      * @var string
@@ -104,27 +104,27 @@ class StatementEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
-    protected $idaccounttype;
+    protected $accounttypeid;
 
-    public function getIdStatement()
+    public function getStatementId()
     {
-        return $this->idstatement;
+        return $this->statementid;
     }
 
     /**
      * @return int
      */
-    public function getIdAccount()
+    public function getAccountId()
     {
-        return $this->idaccount;
+        return $this->accountid;
     }
 
     /**
      * @return string
      */
-    public function getIdType()
+    public function getTypeId()
     {
-        return $this->idtype;
+        return $this->typeid;
     }
 
     /**
@@ -194,9 +194,9 @@ class StatementEntity extends BaseModel
     /**
      * @return int
      */
-    public function getIdStatementParent()
+    public function getStatementParentId()
     {
-        return $this->idstatementparent;
+        return $this->statementparentid;
     }
 
     /**
@@ -210,24 +210,24 @@ class StatementEntity extends BaseModel
     /**
      * @return string
      */
-    public function getIdAccountType()
+    public function getAccountTypeId()
     {
-        return $this->idaccounttype;
+        return $this->accounttypeid;
     }
 
-    public function setIdStatement($idstatement)
+    public function setStatementId($statementid)
     {
-        $this->idstatement = $idstatement;
+        $this->statementid = $statementid;
     }
 
-    public function setIdAccount($idaccount)
+    public function setAccountId($accountid)
     {
-        $this->idaccount = $idaccount;
+        $this->accountid = $accountid;
     }
 
-    public function setIdType($idtype)
+    public function setTypeId($typeid)
     {
-        $this->idtype = $idtype;
+        $this->typeid = $typeid;
     }
 
     public function setAmount($amount)
@@ -270,14 +270,14 @@ class StatementEntity extends BaseModel
         $this->description = $description;
     }
 
-    public function setIdStatementParent($idstatementparent)
+    public function setStatementParentId($statementparentid)
     {
-        $this->idstatementparent = $idstatementparent;
+        $this->statementparentid = $statementparentid;
     }
 
-    public function setIdAccountType($idaccounttype)
+    public function setAccountTypeId($accounttypeid)
     {
-        $this->idaccounttype = $idaccounttype;
+        $this->accounttypeid = $accounttypeid;
     }
 
     public function setReference($reference)
@@ -292,8 +292,8 @@ class StatementEntity extends BaseModel
 
     public function attachAccount(AccountEntity $account)
     {
-        $this->setIdAccount($account->getIdAccount());
-        $this->setIdAccountType($account->getIdAccountType());
+        $this->setAccountId($account->getAccountId());
+        $this->setAccountTypeId($account->getAccountTypeId());
         $this->setGrossBalance($account->getGrossBalance());
         $this->setNetBalance($account->getNetBalance());
         $this->setUnCleared($account->getUnCleared());

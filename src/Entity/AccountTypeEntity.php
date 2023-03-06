@@ -18,7 +18,7 @@ class AccountTypeEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
-    protected $idaccounttype;
+    protected $accounttypeid;
 
     /**
      * @var string
@@ -26,9 +26,9 @@ class AccountTypeEntity extends BaseModel
      */
     protected $name;
     
-    public function getIdAccountType()
+    public function getAccountTypeId()
     {
-        return $this->idaccounttype;
+        return $this->accounttypeid;
     }
 
     public function getName()
@@ -36,9 +36,9 @@ class AccountTypeEntity extends BaseModel
         return $this->name;
     }
 
-    public function setIdAccountType($idaccounttype)
+    public function setAccountTypeId($accounttypeid)
     {
-        $this->idaccounttype = $idaccounttype;
+        $this->accounttypeid = $accounttypeid;
     }
 
     public function setName($name)

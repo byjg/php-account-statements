@@ -59,8 +59,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "USDTEST",
-                "iduser" => "___TESTUSER-10",
+                "accounttypeid" => "USDTEST",
+                "userid" => "___TESTUSER-10",
                 "balance" => 1000,
                 "price" => 1,
                 "extra" => "Extra Information",
@@ -74,13 +74,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 0,
             "netbalance" => 1000,
@@ -97,7 +97,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount" => $result['idaccount'],
+                "accountid" => $result['accountid'],
                 "balance" => 300,
                 "description" => "Adjust New Balance",
             ])
@@ -109,13 +109,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 300,
             "uncleared" => 0,
             "netbalance" => 300,
@@ -132,7 +132,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount" => $result['idaccount'],
+                "accountid" => $result['accountid'],
                 "balance" => 600,
                 "price" => 1.1,
                 "minvalue" => -1000,
@@ -146,13 +146,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 600,
             "uncleared" => 0,
             "netbalance" => 600,
@@ -168,7 +168,7 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('POST')
-            ->withPath("/account/closeaccount/" . $result['idaccount'])
+            ->withPath("/account/closeaccount/" . $result['accountid'])
         ;
         $this->assertRequest($request);
 
@@ -176,13 +176,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 0,
             "uncleared" => 0,
             "netbalance" => 0,
@@ -212,8 +212,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "USDTEST",
-                "iduser"        => "___TESTUSER-10",
+                "accounttypeid" => "USDTEST",
+                "userid"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -228,7 +228,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount"     => $result["idaccount"],
+                "accountid"     => $result["accountid"],
                 "amount"        => 150,
                 "reference"     => "C0CADA-DAB0A",
                 "description"   => "Add Funds",
@@ -240,13 +240,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 1150,
             "uncleared" => 0,
             "netbalance" => 1150,
@@ -261,22 +261,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$statement['idstatement']}")
+            ->withPath("/statement/{$statement['statementid']}")
         ;
         $statementResult = $this->assertRequest($request);
         $expectedStatement = [
             'price' => 1,
-            'idstatement' => $statement['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'D',
+            'statementid' => $statement['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'D',
             'amount' => 150,
             'grossbalance' => 1150,
             'uncleared' => 0,
             'netbalance' => 1150,
             'description' => 'Add Funds',
-            'idstatementparent' => '',
+            'statementparentid' => '',
             'reference' => 'C0CADA-DAB0A',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
         $this->assertEquals($expectedStatement, $statementResult);
@@ -301,8 +301,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "USDTEST",
-                "iduser"        => "___TESTUSER-10",
+                "accounttypeid" => "USDTEST",
+                "userid"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -317,7 +317,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount"     => $result["idaccount"],
+                "accountid"     => $result["accountid"],
                 "amount"        => 150,
                 "reference"     => "C0CADA-DAB0A",
                 "description"   => "Withdraw Funds",
@@ -329,13 +329,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 850,
             "uncleared" => 0,
             "netbalance" => 850,
@@ -350,22 +350,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$statement['idstatement']}")
+            ->withPath("/statement/{$statement['statementid']}")
         ;
         $statementResult = $this->assertRequest($request);
         $expectedStatement = [
             'price' => 1,
-            'idstatement' => $statement['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'W',
+            'statementid' => $statement['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'W',
             'amount' => 150,
             'grossbalance' => 850,
             'uncleared' => 0,
             'netbalance' => 850,
             'description' => 'Withdraw Funds',
-            'idstatementparent' => '',
+            'statementparentid' => '',
             'reference' => 'C0CADA-DAB0A',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
         $this->assertEquals($expectedStatement, $statementResult);
@@ -391,8 +391,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "USDTEST",
-                "iduser"        => "___TESTUSER-10",
+                "accounttypeid" => "USDTEST",
+                "userid"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -408,7 +408,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount"     => $result["idaccount"],
+                "accountid"     => $result["accountid"],
                 "amount"        => 150,
                 "reference"     => "C0CADA-DAB0A-01",
                 "description"   => "Withdraw Funds 01",
@@ -423,7 +423,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccount"     => $result["idaccount"],
+                "accountid"     => $result["accountid"],
                 "amount"        => 250,
                 "reference"     => "C0CADA-DAB0A-02",
                 "description"   => "Withdraw Funds 02",
@@ -437,13 +437,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 1000,
             "uncleared" => 400,
             "netbalance" => 600,
@@ -458,22 +458,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$statement['idstatement']}")
+            ->withPath("/statement/{$statement['statementid']}")
         ;
         $statementResult1 = $this->assertRequest($request);
         $expectedStatement1 = [
             'price' => 1,
-            'idstatement' => $statement['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'WB',
+            'statementid' => $statement['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'WB',
             'amount' => 150,
             'grossbalance' => 1000,
             'uncleared' => 150,
             'netbalance' => 850,
             'description' => 'Withdraw Funds 01',
-            'idstatementparent' => '',
+            'statementparentid' => '',
             'reference' => 'C0CADA-DAB0A-01',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult1['date']);
         $this->assertEquals($expectedStatement1, $statementResult1);
@@ -482,22 +482,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$statement2['idstatement']}")
+            ->withPath("/statement/{$statement2['statementid']}")
         ;
         $statementResult2 = $this->assertRequest($request);
         $expectedStatement2 = [
             'price' => 1,
-            'idstatement' => $statement2['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'WB',
+            'statementid' => $statement2['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'WB',
             'amount' => 250,
             'grossbalance' => 1000,
             'uncleared' => 400,
             'netbalance' => 600,
             'description' => 'Withdraw Funds 02',
-            'idstatementparent' => '',
+            'statementparentid' => '',
             'reference' => 'C0CADA-DAB0A-02',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult2['date']);
         $this->assertEquals($expectedStatement2, $statementResult2);
@@ -506,7 +506,7 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/unclearedstatements/{$result['idaccount']}")
+            ->withPath("/statement/unclearedstatements/{$result['accountid']}")
         ;
         $unclearedStatements = $this->assertRequest($request);
         unset($unclearedStatements[0]['date']);
@@ -525,13 +525,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('POST')
-            ->withPath("/statement/rejectfunds/{$statement['idstatement']}");
+            ->withPath("/statement/rejectfunds/{$statement['statementid']}");
         $st01 = $this->assertRequest($request);
 
         $request = new SwaggerRequester();
         $request
             ->withMethod('POST')
-            ->withPath("/statement/acceptfunds/{$statement2['idstatement']}");
+            ->withPath("/statement/acceptfunds/{$statement2['statementid']}");
         $st02 = $this->assertRequest($request);
 
 
@@ -541,13 +541,13 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/account/{$result['idaccount']}")
+            ->withPath("/account/{$result['accountid']}")
         ;
         $account = $this->assertRequest($request);
         $expectedAccount = [
-            "idaccount" => $result['idaccount'],
-            "idaccounttype" => "USDTEST",
-            "iduser" => "___TESTUSER-10",
+            "accountid" => $result['accountid'],
+            "accounttypeid" => "USDTEST",
+            "userid" => "___TESTUSER-10",
             "grossbalance" => 750,
             "uncleared" => 0,
             "netbalance" => 750,
@@ -562,22 +562,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$st01['idstatement']}")
+            ->withPath("/statement/{$st01['statementid']}")
         ;
         $statementResult = $this->assertRequest($request);
         $expectedStatement = [
             'price' => 1,
-            'idstatement' => $st01['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'R',
+            'statementid' => $st01['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'R',
             'amount' => 150,
             'grossbalance' => 1000,
             'uncleared' => 250,
             'netbalance' => 750,
             'description' => 'Withdraw Funds 01',
-            'idstatementparent' => $statement['idstatement'],
+            'statementparentid' => $statement['statementid'],
             'reference' => 'C0CADA-DAB0A-01',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
         $this->assertEquals($expectedStatement, $statementResult);
@@ -585,22 +585,22 @@ class RestCallTestA extends SwaggerTestCase
         $request = new SwaggerRequester();
         $request
             ->withMethod('GET')
-            ->withPath("/statement/{$st02['idstatement']}")
+            ->withPath("/statement/{$st02['statementid']}")
         ;
         $statementResult = $this->assertRequest($request);
         $expectedStatement = [
             'price' => 1,
-            'idstatement' => $st02['idstatement'],
-            'idaccount' => $result['idaccount'],
-            'idtype' => 'W',
+            'statementid' => $st02['statementid'],
+            'accountid' => $result['accountid'],
+            'typeid' => 'W',
             'amount' => 250,
             'grossbalance' => 750,
             'uncleared' => 0,
             'netbalance' => 750,
             'description' => 'Withdraw Funds 02',
-            'idstatementparent' => $statement2['idstatement'],
+            'statementparentid' => $statement2['statementid'],
             'reference' => 'C0CADA-DAB0A-02',
-            'idaccounttype' => 'USDTEST'
+            'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
         $this->assertEquals($expectedStatement, $statementResult);
@@ -625,8 +625,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "USDTEST",
-                "iduser"        => "___TESTUSER-10",
+                "accounttypeid" => "USDTEST",
+                "userid"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -645,9 +645,9 @@ class RestCallTestA extends SwaggerTestCase
 
         $this->assertEquals([
             [
-                "idaccount" => $account["idaccount"],
-                "idaccounttype" => "USDTEST",
-                "iduser" => "___TESTUSER-10",
+                "accountid" => $account["accountid"],
+                "accounttypeid" => "USDTEST",
+                "userid" => "___TESTUSER-10",
                 "grossbalance" => 1000,
                 "uncleared" => 0,
                 "netbalance" => 1000,
@@ -676,8 +676,8 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "ABCTEST",
-                "iduser"        => "___TESTUSER-10",
+                "accounttypeid" => "ABCTEST",
+                "userid"        => "___TESTUSER-10",
                 "balance"       => 1000,
                 "price"         => 1,
                 "extra"         => "Extra Information",
@@ -696,9 +696,9 @@ class RestCallTestA extends SwaggerTestCase
 
         $this->assertEquals([
             [
-                "idaccount" => $account["idaccount"],
-                "idaccounttype" => "ABCTEST",
-                "iduser" => "___TESTUSER-10",
+                "accountid" => $account["accountid"],
+                "accounttypeid" => "ABCTEST",
+                "userid" => "___TESTUSER-10",
                 "grossbalance" => 1000,
                 "uncleared" => 0,
                 "netbalance" => 1000,
@@ -711,12 +711,12 @@ class RestCallTestA extends SwaggerTestCase
 
     public function testAccountType()
     {
-        // Create a new IdAccountType
+        // Create a new AccountTypeId
         $request = new SwaggerRequester();
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => "XXXTEST",
+                "accounttypeid" => "XXXTEST",
                 "name" => "Test XXX 1"
             ])
             ->withPath("/accounttype")
@@ -728,7 +728,7 @@ class RestCallTestA extends SwaggerTestCase
         $request
             ->withMethod('POST')
             ->withRequestBody([
-                "idaccounttype" => $result["idaccounttype"],
+                "accounttypeid" => $result["accounttypeid"],
                 "name" => "Test XXX 2"
             ])
             ->withPath("/accounttype")

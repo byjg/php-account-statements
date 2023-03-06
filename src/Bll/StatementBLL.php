@@ -41,14 +41,14 @@ class StatementBLL
     /**
      * Get a Statement By ID.
      *
-     * @param int|string $idStatement Optional. empty, return all all ids.
+     * @param int|string $statementId Optional. empty, return all all ids.
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getById($idStatement)
+    public function getById($statementId)
     {
-        return $this->statementRepository->getById($idStatement);
+        return $this->statementRepository->getById($statementId);
     }
 
     /**
@@ -70,9 +70,9 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getIdaccount());
-            if (is_null($account) || $account->getIdAccount() == "") {
-                throw new AccountException("addFunds: Account " . $dto->getIdaccount() . " not found");
+            $account = $this->accountRepository->getById($dto->getaccountId());
+            if (is_null($account) || $account->getAccountId() == "") {
+                throw new AccountException("addFunds: Account " . $dto->getaccountId() . " not found");
             }
 
             // Update Values in an account
@@ -83,7 +83,7 @@ class StatementBLL
             // Add the new line
             $statement = new StatementEntity();
             $statement->setAmount($dto->getAmount());
-            $statement->setIdType(StatementEntity::DEPOSIT);
+            $statement->setTypeId(StatementEntity::DEPOSIT);
             $statement->setDescription($dto->getDescription());
             $statement->setReference($dto->getReference());
             $statement->setCode($dto->getCode());
@@ -94,7 +94,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -119,7 +119,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getIdaccount());
+            $account = $this->accountRepository->getById($dto->getaccountId());
             if (is_null($account)) {
                 throw new AccountException('addFunds: Account not found');
             }
@@ -136,9 +136,9 @@ class StatementBLL
 
             // Create the Statement
             $statement = new StatementEntity();
-            $statement->setIdAccount($dto->getIdaccount());
+            $statement->setAccountId($dto->getaccountId());
             $statement->setAmount($dto->getAmount());
-            $statement->setIdType(StatementEntity::WITHDRAW);
+            $statement->setTypeId(StatementEntity::WITHDRAW);
             $statement->setDescription($dto->getDescription());
             $statement->setReference($dto->getReference());
             $statement->setCode($dto->getCode());
@@ -148,7 +148,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -174,7 +174,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getIdaccount());
+            $account = $this->accountRepository->getById($dto->getaccountId());
             if (is_null($account)) {
                 throw new AccountException('reserveFundsForWithdraw: Account not found');
             }
@@ -191,9 +191,9 @@ class StatementBLL
 
             // Create Statement
             $statement = new StatementEntity();
-            $statement->setIdAccount($dto->getIdaccount());
+            $statement->setAccountId($dto->getaccountId());
             $statement->setAmount($dto->getAmount());
-            $statement->setIdType(StatementEntity::WITHDRAWBLOCKED);
+            $statement->setTypeId(StatementEntity::WITHDRAWBLOCKED);
             $statement->setDescription($dto->getDescription());
             $statement->setReference($dto->getReference());
             $statement->setCode($dto->getCode());
@@ -203,7 +203,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -229,7 +229,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getIdaccount());
+            $account = $this->accountRepository->getById($dto->getaccountId());
             if (is_null($account)) {
                 throw new AccountException('reserveFundsForDeposit: Account not found');
             }
@@ -241,9 +241,9 @@ class StatementBLL
 
             // Create Statement
             $statement = new StatementEntity();
-            $statement->setIdAccount($dto->getIdaccount());
+            $statement->setAccountId($dto->getaccountId());
             $statement->setAmount($dto->getAmount());
-            $statement->setIdType(StatementEntity::DEPOSITBLOCKED);
+            $statement->setTypeId(StatementEntity::DEPOSITBLOCKED);
             $statement->setDescription($dto->getDescription());
             $statement->setReference($dto->getReference());
             $statement->setCode($dto->getCode());
@@ -253,7 +253,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -281,7 +281,7 @@ class StatementBLL
             }
 
             // Validate if statement can be accepted.
-            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
+            if ($statement->getTypeId() != StatementEntity::WITHDRAWBLOCKED && $statement->getTypeId() != StatementEntity::DEPOSITBLOCKED) {
                 throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
@@ -291,19 +291,19 @@ class StatementBLL
             }
 
             // Get values and apply the updates
-            $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? 1 : -1;
+            $signal = $statement->getTypeId() == StatementEntity::DEPOSITBLOCKED ? 1 : -1;
 
-            $account = $this->accountRepository->getById($statement->getIdAccount());
+            $account = $this->accountRepository->getById($statement->getAccountId());
             $account->setUnCleared($account->getUnCleared() + ($statement->getAmount() * $signal));
             $account->setGrossBalance($account->getGrossBalance() + ($statement->getAmount() * $signal));
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
             // Update data
-            $statement->setIdStatementParent($statement->getIdStatement());
-            $statement->setIdStatement(null); // Poder criar um novo registro
+            $statement->setStatementParentId($statement->getStatementId());
+            $statement->setStatementId(null); // Poder criar um novo registro
             $statement->setDate(null);
-            $statement->setIdType($statement->getIdType() == StatementEntity::WITHDRAWBLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
+            $statement->setTypeId($statement->getTypeId() == StatementEntity::WITHDRAWBLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
             $statement->attachAccount($account);
             if (!empty($description)) {
                 $statement->setDescription($description);
@@ -315,7 +315,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -343,7 +343,7 @@ class StatementBLL
             }
 
             // Validate if statement can be accepted.
-            if ($statement->getIdType() != StatementEntity::WITHDRAWBLOCKED && $statement->getIdType() != StatementEntity::DEPOSITBLOCKED) {
+            if ($statement->getTypeId() != StatementEntity::WITHDRAWBLOCKED && $statement->getTypeId() != StatementEntity::DEPOSITBLOCKED) {
                 throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
@@ -353,19 +353,19 @@ class StatementBLL
             }
 
             // Update Account
-            $signal = $statement->getIdType() == StatementEntity::DEPOSITBLOCKED ? -1 : +1;
+            $signal = $statement->getTypeId() == StatementEntity::DEPOSITBLOCKED ? -1 : +1;
 
-            $account = $this->accountRepository->getById($statement->getIdAccount());
+            $account = $this->accountRepository->getById($statement->getAccountId());
             $account->setUnCleared($account->getUnCleared() - ($statement->getAmount() * $signal));
             $account->setNetBalance($account->getNetBalance() + ($statement->getAmount() * $signal));
             $account->setEntryDate(null);
             $this->accountRepository->save($account);
 
             // Update Statement
-            $statement->setIdStatementParent($statement->getIdStatement());
-            $statement->setIdStatement(null); // Poder criar um novo registro
+            $statement->setStatementParentId($statement->getStatementId());
+            $statement->setStatementId(null); // Poder criar um novo registro
             $statement->setDate(null);
-            $statement->setIdType(StatementEntity::REJECT);
+            $statement->setTypeId(StatementEntity::REJECT);
             $statement->attachAccount($account);
             if (!empty($description)) {
                 $statement->setDescription($description);
@@ -377,7 +377,7 @@ class StatementBLL
 
             $connectionManager->commitTransaction();
 
-            return $result->getIdStatement();
+            return $result->getStatementId();
         } catch (Exception $ex) {
             $connectionManager->rollbackTransaction();
 
@@ -388,32 +388,32 @@ class StatementBLL
     /**
      * Update all blocked (reserved) transactions
      *
-     * @param int $idAccount
+     * @param int $accountId
      * @return StatementEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUnclearedStatements($idAccount = null)
+    public function getUnclearedStatements($accountId = null)
     {
-        return $this->statementRepository->getUnclearedStatements($idAccount);
+        return $this->statementRepository->getUnclearedStatements($accountId);
     }
 
-    public function getByDate($idAccount, $startDate, $endDate)
+    public function getByDate($accountId, $startDate, $endDate)
     {
-        return $this->statementRepository->getByDate($idAccount, $startDate, $endDate);
+        return $this->statementRepository->getByDate($accountId, $startDate, $endDate);
     }
 
     /**
      * This statement is blocked (reserved)
      *
-     * @param int $idStatement
+     * @param int $statementId
      * @return bool
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function isStatementUncleared($idStatement = null)
+    public function isStatementUncleared($statementId = null)
     {
-        return null === $this->statementRepository->getByIdParent($idStatement, true);
+        return null === $this->statementRepository->getByIdParent($statementId, true);
     }
 
     /**
