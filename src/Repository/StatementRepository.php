@@ -38,7 +38,7 @@ class StatementRepository extends BaseRepository
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getByIdParent($parentId, $forUpdate = false)
+    public function getByParentId($parentId, $forUpdate = false)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())

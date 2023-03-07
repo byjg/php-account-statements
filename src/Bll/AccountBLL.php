@@ -77,11 +77,11 @@ class AccountBLL
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUserId($userId, $accountType = "")
+    public function getByUserId($userId, $accountType = "")
     {
         
 
-        return $this->accountRepository->getUserId($userId, $accountType);
+        return $this->accountRepository->getByUserId($userId, $accountType);
     }
 
     /**
@@ -92,9 +92,9 @@ class AccountBLL
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getAccountTypeId($accountTypeId)
+    public function getByAccountTypeId($accountTypeId)
     {
-        return $this->accountRepository->getAccountTypeId($accountTypeId);
+        return $this->accountRepository->getByAccountTypeId($accountTypeId);
     }
 
     /**

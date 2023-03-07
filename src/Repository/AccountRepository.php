@@ -36,7 +36,7 @@ class AccountRepository extends BaseRepository
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUserId($userId, $accountType = "")
+    public function getByUserId($userId, $accountType = "")
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -57,7 +57,7 @@ class AccountRepository extends BaseRepository
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getAccountTypeId($accountTypeId)
+    public function getByAccountTypeId($accountTypeId)
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())

@@ -321,7 +321,7 @@ class AccountStatementsTest extends TestCase
             'Extra Information'
         );
 
-        $account = $this->accountBLL->getUserId("___TESTUSER-10");
+        $account = $this->accountBLL->getByUserId("___TESTUSER-10");
         $account[0]->setEntryDate(null);
 
         $accountEntity = new AccountEntity([
@@ -363,7 +363,7 @@ class AccountStatementsTest extends TestCase
             'Extra Information'
         );
 
-        $account = $this->accountBLL->getAccountTypeId('ABCTEST');
+        $account = $this->accountBLL->getByAccountTypeId('ABCTEST');
         $account[0]->setEntryDate(null);
 
         $accountEntity = new AccountEntity([

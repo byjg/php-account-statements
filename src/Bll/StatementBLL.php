@@ -286,7 +286,7 @@ class StatementBLL
             }
 
             // Validate if the statement has been already accepted.
-            if ($this->statementRepository->getByIdParent($statementId) != null) {
+            if ($this->statementRepository->getByParentId($statementId) != null) {
                 throw new StatementException('The statement has been accepted already');
             }
 
@@ -348,7 +348,7 @@ class StatementBLL
             }
 
             // Validate if the statement has been already accepted.
-            if ($this->statementRepository->getByIdParent($statementId) != null) {
+            if ($this->statementRepository->getByParentId($statementId) != null) {
                 throw new StatementException('The statement has been accepted already');
             }
 
@@ -413,7 +413,7 @@ class StatementBLL
      */
     public function isStatementUncleared($statementId = null)
     {
-        return null === $this->statementRepository->getByIdParent($statementId, true);
+        return null === $this->statementRepository->getByParentId($statementId, true);
     }
 
     /**
