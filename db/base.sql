@@ -74,7 +74,7 @@ CREATE TABLE `statement` (
   `netbalance` decimal(15,5) DEFAULT NULL,
   `description` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `statementparentid` int(11) DEFAULT NULL,
-  `reference` varchar(45) COLLATE utf8_bin DEFAULT NULL,
+  `reference` varchar(100) COLLATE utf8_bin DEFAULT NULL,
   PRIMARY KEY (`statementid`),
   KEY `fk_statement_account1_idx` (`accountid`),
   KEY `fk_statement_statement1_idx` (`statementparentid`),
