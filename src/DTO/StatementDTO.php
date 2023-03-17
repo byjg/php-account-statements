@@ -10,7 +10,8 @@ class StatementDTO
     protected $amount;
 
     protected $description = null;
-    protected $reference = null;
+    protected $referenceid = null;
+    protected $referencesource = null;
     protected $code = null;
 
     /**
@@ -56,9 +57,17 @@ class StatementDTO
     /**
      * @return string
      */
-    public function getReference()
+    public function getReferenceId()
     {
-        return $this->reference;
+        return $this->referenceid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReferenceSource()
+    {
+        return $this->referencesource;
     }
 
     /**
@@ -80,12 +89,22 @@ class StatementDTO
     }
 
     /**
-     * @param string $reference
+     * @param string $referenceid
      * @return StatementDTO
      */
-    public function setReference($reference)
+    public function setReferenceId($referenceid)
     {
-        $this->reference = $reference;
+        $this->referenceid = $referenceid;
+        return $this;
+    }
+
+    /**
+     * @param string $referencesource
+     * @return StatementDTO
+     */
+    public function setReferenceSource($referencesource)
+    {
+        $this->referencesource = $referencesource;
         return $this;
     }
 

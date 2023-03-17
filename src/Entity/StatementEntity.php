@@ -98,7 +98,13 @@ class StatementEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
-    protected $reference;
+    protected $referenceid;
+
+    /**
+     * @var string
+     * @OA\Property()
+     */
+    protected $referencesource;
 
     /**
      * @var string
@@ -202,9 +208,17 @@ class StatementEntity extends BaseModel
     /**
      * @return string
      */
-    public function getReference()
+    public function getReferenceId()
     {
-        return $this->reference;
+        return $this->referenceid;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReferenceSource()
+    {
+        return $this->referencesource;
     }
 
     /**
@@ -280,9 +294,14 @@ class StatementEntity extends BaseModel
         $this->accounttypeid = $accounttypeid;
     }
 
-    public function setReference($reference)
+    public function setReferenceId($referenceid)
     {
-        $this->reference = $reference;
+        $this->referenceid = $referenceid;
+    }
+
+    public function setReferenceSource($referencesource)
+    {
+        $this->referencesource = $referencesource;
     }
 
     /**

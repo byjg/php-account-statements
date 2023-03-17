@@ -67,5 +67,21 @@ $statementId = $statementBLL->reserveFundsForDeposit($statement);
 $statementBLL->acceptFundsById($statementId);
 ```
 
+## Installation
+
+```bash
+composer require byjg/account-statements
+```
+
+## Testing
+
+```bash
+docker run --name mysql-container --rm  -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql:8.0
+vendor/bin/phpunit
+```
+
+
+
+
 @todo Documentation
 @todo Rest

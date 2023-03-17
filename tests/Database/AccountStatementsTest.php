@@ -86,7 +86,13 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 10)->setDescription( 'Test')->setReference('Referencia')->setCode('XYZ'));
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::instance($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+                ->setCode('XYZ')
+            );
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -100,7 +106,8 @@ class AccountStatementsTest extends TestCase
         $statement->setNetBalance('990.00000');
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
-        $statement->setReference('Referencia');
+        $statement->setReferenceId('Referencia');
+        $statement->setReferenceSource('Source');
         $statement->setCode('XYZ');
         $statement->setAccountTypeId('USDTEST');
 
@@ -121,8 +128,18 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 10)->setDescription( 'Test')->setReference('Referencia'));
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 50)->setDescription('Test')->setReference('Referencia'));
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::instance($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+            );
+        $this->statementBLL->withdrawFunds(
+            StatementDTO::instance($accountId, 50)
+                ->setDescription('Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+            );
 
         $statement = [];
 
@@ -139,7 +156,8 @@ class AccountStatementsTest extends TestCase
         $statement[0]->setNetBalance('1000.00000');
         $statement[0]->setPrice('1.00000');
         $statement[0]->setUnCleared('0.00000');
-        $statement[0]->setReference('');
+        $statement[0]->setReferenceId('');
+        $statement[0]->setReferenceSource('');
         $statement[0]->setAccountTypeId('USDTEST');
 
         $statement[] = new StatementEntity;
@@ -153,7 +171,8 @@ class AccountStatementsTest extends TestCase
         $statement[1]->setNetBalance('990.00000');
         $statement[1]->setPrice('1.00000');
         $statement[1]->setUnCleared('0.00000');
-        $statement[1]->setReference('Referencia');
+        $statement[1]->setReferenceId('Referencia');
+        $statement[1]->setReferenceSource('Source');
         $statement[1]->setAccountTypeId('USDTEST');
 
         $statement[] = new StatementEntity;
@@ -167,7 +186,8 @@ class AccountStatementsTest extends TestCase
         $statement[2]->setNetBalance('940.00000');
         $statement[2]->setPrice('1.00000');
         $statement[2]->setUnCleared('0.00000');
-        $statement[2]->setReference('Referencia');
+        $statement[2]->setReferenceId('Referencia');
+        $statement[2]->setReferenceSource('Source');
         $statement[2]->setAccountTypeId('USDTEST');
 
         $listAll = $this->statementBLL->getRepository()->getAll(null, null, null, [["accounttypeid = :id",["id" => 'USDTEST']]]);
@@ -190,7 +210,12 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->addFunds(StatementDTO::instance($accountId, 250)->setDescription('Test Add Funds')->setReference('Referencia Add Funds'));
+        $statementId = $this->statementBLL->addFunds(
+            StatementDTO::instance($accountId, 250)
+                ->setDescription('Test Add Funds')
+                ->setReferenceId('Referencia Add Funds')
+                ->setReferenceSource('Source Add Funds')
+            );
 
         // Check
         $statement = new StatementEntity;
@@ -204,7 +229,8 @@ class AccountStatementsTest extends TestCase
         $statement->setNetBalance('1250.00000');
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
-        $statement->setReference('Referencia Add Funds');
+        $statement->setReferenceId('Referencia Add Funds');
+        $statement->setReferenceSource('Source Add Funds');
         $statement->setAccountTypeId('USDTEST');
 
         $actual = $this->statementBLL->getById($statementId);
@@ -228,7 +254,12 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 350)->setDescription( 'Test Withdraw')->setReference('Referencia Withdraw'));
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::instance($accountId, 350)
+                ->setDescription( 'Test Withdraw')
+                ->setReferenceId('Referencia Withdraw')
+                ->setReferenceSource('Source Withdraw')
+            );
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -242,7 +273,8 @@ class AccountStatementsTest extends TestCase
         $statement->setNetBalance('650.00000');
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
-        $statement->setReference('Referencia Withdraw');
+        $statement->setReferenceId('Referencia Withdraw');
+        $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
 
         $actual = $this->statementBLL->getById($statementId);
@@ -267,7 +299,12 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
-        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 1150)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::instance($accountId, 1150)
+                ->setDescription('Test Withdraw')
+                ->setReferenceId('Referencia Withdraw')
+                ->setReferenceSource('Source Withdraw')
+            );
 
         // Objeto que é esperado
         $statement = new StatementEntity();
@@ -281,7 +318,8 @@ class AccountStatementsTest extends TestCase
         $statement->setNetBalance('-150.00000');
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
-        $statement->setReference('Referencia Withdraw');
+        $statement->setReferenceId('Referencia Withdraw');
+        $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
 
         $actual = $this->statementBLL->getById($statementId);
@@ -297,7 +335,7 @@ class AccountStatementsTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 1401)->setDescription('Test Withdraw')->setReference('Referencia Withdraw'));
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 1401)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
     /**
@@ -423,8 +461,9 @@ class AccountStatementsTest extends TestCase
                 'amount' => '650.00000',
                 'description' => 'Reset Balance',
                 'statementparentid' => '',
-                'reference' => '',
-                'code' => 'BAL'
+                'code' => 'BAL',
+                'referenceid' => '',
+                'referencesource' => ''
             ],
             $statement
         );
@@ -469,7 +508,8 @@ class AccountStatementsTest extends TestCase
                 'amount' => '350.00000',
                 'description' => 'Partial Balance',
                 'statementparentid' => '',
-                'reference' => '',
+                'referenceid' => '',
+                'referencesource' => '',
                 'code' => ''
             ],
             $statement
@@ -522,7 +562,8 @@ class AccountStatementsTest extends TestCase
                 'amount' => '0.00000',
                 'description' => 'Reset Balance',
                 'statementparentid' => '',
-                'reference' => '',
+                'referenceid' => '',
+                'referencesource' => '',
                 'code' => 'BAL'
             ],
             $statement
@@ -559,7 +600,8 @@ class AccountStatementsTest extends TestCase
                     'typeid' => 'D',
                     'amount' => '1000.00000',
                     'description' => 'Opening Balance',
-                    'reference' => '',
+                    'referenceid' => '',
+                    'referencesource' => '',
                     'statementparentid' => '',
                     'code' => 'BAL'
                 ],
@@ -574,7 +616,8 @@ class AccountStatementsTest extends TestCase
                     'typeid' => 'D',
                     'amount' => '400.00000',
                     'description' => '',
-                    'reference' => '',
+                    'referenceid' => '',
+                    'referencesource' => '',
                     'statementparentid' => '',
                     'code' => ''
                 ],
@@ -589,7 +632,8 @@ class AccountStatementsTest extends TestCase
                     'typeid' => 'W',
                     'amount' => '300.00000',
                     'description' => '',
-                    'reference' => '',
+                    'referenceid' => '',
+                    'referencesource' => '',
                     'statementparentid' => '',
                     'code' => ''
                 ],

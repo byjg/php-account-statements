@@ -85,7 +85,8 @@ class StatementBLL
             $statement->setAmount($dto->getAmount());
             $statement->setTypeId(StatementEntity::DEPOSIT);
             $statement->setDescription($dto->getDescription());
-            $statement->setReference($dto->getReference());
+            $statement->setReferenceId($dto->getReferenceId());
+            $statement->setReferenceSource($dto->getReferenceSource());
             $statement->setCode($dto->getCode());
             $statement->attachAccount($account);
 
@@ -140,7 +141,8 @@ class StatementBLL
             $statement->setAmount($dto->getAmount());
             $statement->setTypeId(StatementEntity::WITHDRAW);
             $statement->setDescription($dto->getDescription());
-            $statement->setReference($dto->getReference());
+            $statement->setReferenceId($dto->getReferenceId());
+            $statement->setReferenceSource($dto->getReferenceSource());
             $statement->setCode($dto->getCode());
             $statement->attachAccount($account);
 
@@ -195,7 +197,8 @@ class StatementBLL
             $statement->setAmount($dto->getAmount());
             $statement->setTypeId(StatementEntity::WITHDRAWBLOCKED);
             $statement->setDescription($dto->getDescription());
-            $statement->setReference($dto->getReference());
+            $statement->setReferenceId($dto->getReferenceId());
+            $statement->setReferenceSource($dto->getReferenceSource());
             $statement->setCode($dto->getCode());
             $statement->attachAccount($account);
 
@@ -245,7 +248,8 @@ class StatementBLL
             $statement->setAmount($dto->getAmount());
             $statement->setTypeId(StatementEntity::DEPOSITBLOCKED);
             $statement->setDescription($dto->getDescription());
-            $statement->setReference($dto->getReference());
+            $statement->setReferenceId($dto->getReferenceId());
+            $statement->setReferenceSource($dto->getReferenceSource());
             $statement->setCode($dto->getCode());
             $statement->attachAccount($account);
 

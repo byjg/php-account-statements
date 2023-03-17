@@ -230,7 +230,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withRequestBody([
                 "accountid"     => $result["accountid"],
                 "amount"        => 150,
-                "reference"     => "C0CADA-DAB0A",
+                "referenceid"     => "C0CADA-DAB0A",
                 "description"   => "Add Funds",
             ])
             ->withPath("/statement/addfunds");
@@ -275,7 +275,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 1150,
             'description' => 'Add Funds',
             'statementparentid' => '',
-            'reference' => 'C0CADA-DAB0A',
+            'referenceid' => 'C0CADA-DAB0A',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
@@ -319,7 +319,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withRequestBody([
                 "accountid"     => $result["accountid"],
                 "amount"        => 150,
-                "reference"     => "C0CADA-DAB0A",
+                "referenceid"     => "C0CADA-DAB0A",
                 "description"   => "Withdraw Funds",
             ])
             ->withPath("/statement/withdrawfunds");
@@ -364,7 +364,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 850,
             'description' => 'Withdraw Funds',
             'statementparentid' => '',
-            'reference' => 'C0CADA-DAB0A',
+            'referenceid' => 'C0CADA-DAB0A',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
@@ -410,7 +410,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withRequestBody([
                 "accountid"     => $result["accountid"],
                 "amount"        => 150,
-                "reference"     => "C0CADA-DAB0A-01",
+                "referenceid"     => "C0CADA-DAB0A-01",
                 "description"   => "Withdraw Funds 01",
             ])
             ->withPath("/statement/reservefundsforwithdraw");
@@ -425,7 +425,7 @@ class RestCallTestA extends SwaggerTestCase
             ->withRequestBody([
                 "accountid"     => $result["accountid"],
                 "amount"        => 250,
-                "reference"     => "C0CADA-DAB0A-02",
+                "referenceid"     => "C0CADA-DAB0A-02",
                 "description"   => "Withdraw Funds 02",
             ])
             ->withPath("/statement/reservefundsforwithdraw");
@@ -472,7 +472,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 850,
             'description' => 'Withdraw Funds 01',
             'statementparentid' => '',
-            'reference' => 'C0CADA-DAB0A-01',
+            'referenceid' => 'C0CADA-DAB0A-01',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult1['date']);
@@ -496,7 +496,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 600,
             'description' => 'Withdraw Funds 02',
             'statementparentid' => '',
-            'reference' => 'C0CADA-DAB0A-02',
+            'referenceid' => 'C0CADA-DAB0A-02',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult2['date']);
@@ -576,7 +576,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 750,
             'description' => 'Withdraw Funds 01',
             'statementparentid' => $statement['statementid'],
-            'reference' => 'C0CADA-DAB0A-01',
+            'referenceid' => 'C0CADA-DAB0A-01',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);
@@ -599,7 +599,7 @@ class RestCallTestA extends SwaggerTestCase
             'netbalance' => 750,
             'description' => 'Withdraw Funds 02',
             'statementparentid' => $statement2['statementid'],
-            'reference' => 'C0CADA-DAB0A-02',
+            'referenceid' => 'C0CADA-DAB0A-02',
             'accounttypeid' => 'USDTEST'
         ];
         unset($statementResult['date']);

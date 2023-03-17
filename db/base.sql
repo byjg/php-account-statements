@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS `account`;
 CREATE TABLE `account` (
   `accountid` int(11) NOT NULL AUTO_INCREMENT,
   `accounttypeid` varchar(20) COLLATE utf8_bin NOT NULL,
-  `userid` int(11) NOT NULL,
+  `userid` varchar(100) NOT NULL,
   `grossbalance` decimal(15,5) DEFAULT '0.00000',
   `uncleared` decimal(15,5) DEFAULT '0.00000',
   `netbalance` decimal(15,5) DEFAULT '0.00000',
