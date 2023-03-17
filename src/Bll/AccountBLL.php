@@ -258,4 +258,9 @@ class AccountBLL
 
         return $statementId;
     }
+
+    public function getRepository()
+    {
+        return $this->accountRepository;
+    }
 }

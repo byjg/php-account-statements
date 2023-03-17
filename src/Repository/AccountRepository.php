@@ -68,4 +68,30 @@ class AccountRepository extends BaseRepository
         return $this->repository
             ->getByQuery($query);
     }
+
+    /**
+     * @param $userId
+     * @param string $statementId
+     * @return AccountEntity|null
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
+     */
+    public function getByStatementId($statementId)
+    {
+        $query = Query::getInstance()
+            ->fields(['account.*'])
+            ->table($this->repository->getMapper()->getTable())
+            ->join('statement', 'statement.accountid = account.accountid')
+            ->where('statementid = :statementid', ['statementid' => $statementId])
+        ;
+
+        $result = $this->repository
+            ->getByQuery($query);
+
+        if (empty($result)) {
+            return null;
+        }
+
+        return $result[0];
+    }
 }

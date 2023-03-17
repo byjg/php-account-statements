@@ -654,5 +654,30 @@ class AccountStatementsTest extends TestCase
 
     }
 
+    public function testGetByStatementId()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $statementId = $this->statementBLL->addFunds(StatementDTO::instance($accountId, 400));
+        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 300));
+
+        $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
+        $this->statementBLL->addFunds(StatementDTO::instance($ignore, 200));
+
+        $accountRepo = $this->accountBLL->getRepository();
+
+        $accountResult = $accountRepo->getByStatementId($statementId);
+        $accountExpected = $accountRepo->getById($accountId);
+
+        // Executar teste
+        $this->assertEquals($accountExpected, $accountResult);
+    }
+
+    public function testGetByStatementIdNotFound()
+    {
+        $accountRepo = $this->accountBLL->getRepository();
+        $accountResult = $accountRepo->getByStatementId(12345); // Dont exists
+        $this->assertNull($accountResult);
+    }
 
 }
