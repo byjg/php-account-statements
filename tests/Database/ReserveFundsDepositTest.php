@@ -49,7 +49,7 @@ class ReserveFundsDepositTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->reserveFundsForDeposit(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
@@ -85,7 +85,7 @@ class ReserveFundsDepositTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($accountId, -50)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+        $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, -50)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
     public function testReserveForDepositFunds_Negative()
@@ -93,7 +93,7 @@ class ReserveFundsDepositTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", -200, 1, -400);
         $statementId = $this->statementBLL->reserveFundsForDeposit(
-            StatementDTO::instance($accountId, 300)
+            StatementDTO::create($accountId, 300)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
@@ -141,7 +141,7 @@ public function testAcceptFundsById_InvalidType()
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->addFunds(
-            StatementDTO::instance($accountId, 200)
+            StatementDTO::create($accountId, 200)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
@@ -156,8 +156,8 @@ public function testAcceptFundsById_InvalidType()
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, 150)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
-        $statementId = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($accountId, 350)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 150)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
+        $statementId = $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, 350)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
 
         // Executar ação
         $this->statementBLL->acceptFundsById($statementId);
@@ -171,13 +171,13 @@ public function testAcceptFundsById_InvalidType()
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(
-            StatementDTO::instance($accountId, 150)
+            StatementDTO::create($accountId, 150)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
             );
         $statementId = $this->statementBLL->reserveFundsForDeposit(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
@@ -214,7 +214,7 @@ public function testAcceptFundsById_InvalidType()
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->addFunds(StatementDTO::instance($accountId, 300));
+        $statementId = $this->statementBLL->addFunds(StatementDTO::create($accountId, 300));
 
         $this->statementBLL->rejectFundsById($statementId);
     }
@@ -225,8 +225,8 @@ public function testAcceptFundsById_InvalidType()
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, 150)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
-        $statementId = $this->statementBLL->reserveFundsForDeposit(StatementDTO::instance($accountId, 350)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 150)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
+        $statementId = $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, 350)->setDescription('Test Deposit')->setReferenceId('Referencia Deposit'));
 
         // Executar ação
         $this->statementBLL->rejectFundsById($statementId);
@@ -240,13 +240,13 @@ public function testAcceptFundsById_InvalidType()
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->addFunds(
-            StatementDTO::instance($accountId, 150)
+            StatementDTO::create($accountId, 150)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')
             );
         $statementId = $this->statementBLL->reserveFundsForDeposit(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Deposit')
                 ->setReferenceId('Referencia Deposit')
                 ->setReferenceSource('Source Deposit')

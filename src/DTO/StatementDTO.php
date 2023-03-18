@@ -10,8 +10,8 @@ class StatementDTO
     protected $amount;
 
     protected $description = null;
-    protected $referenceid = null;
-    protected $referencesource = null;
+    protected $referenceId = null;
+    protected $referenceSource = null;
     protected $code = null;
 
     /**
@@ -21,21 +21,47 @@ class StatementDTO
      */
     public function __construct($accountId, $amount)
     {
-        $this->accountid = $accountId;
+        $this->accountId = $accountId;
         $this->amount = $amount;
     }
 
-    public static function instance($accountId, $amount)
+    public static function create($accountId, $amount)
     {
         return new StatementDTO($accountId, $amount);
+    }
+
+    public static function createEmpty()
+    {
+        return new StatementDTO(null, null);
+    }
+
+    public function hasAccount()
+    {
+        return !empty($this->accountId) && !empty($this->amount);
+    }
+
+    public function setToStatement($statement)
+    {
+        if (!empty($this->getDescription())) {
+            $statement->setDescription($this->getDescription());
+        }
+        if (!empty($this->getCode())) {
+            $statement->setCode($this->getCode());
+        }
+        if (!empty($this->getReferenceId())) {
+            $statement->setReferenceId($this->getReferenceId());
+        }
+        if (!empty($this->getReferenceSource())) {
+            $statement->setReferenceSource($this->getReferenceSource());
+        }
     }
 
     /**
      * @return mixed
      */
-    public function getaccountId()
+    public function getAccountId()
     {
-        return $this->accountid;
+        return $this->accountId;
     }
 
     /**
@@ -59,7 +85,7 @@ class StatementDTO
      */
     public function getReferenceId()
     {
-        return $this->referenceid;
+        return $this->referenceId;
     }
 
     /**
@@ -67,7 +93,7 @@ class StatementDTO
      */
     public function getReferenceSource()
     {
-        return $this->referencesource;
+        return $this->referenceSource;
     }
 
     /**
@@ -89,22 +115,22 @@ class StatementDTO
     }
 
     /**
-     * @param string $referenceid
+     * @param string $referenceId
      * @return StatementDTO
      */
-    public function setReferenceId($referenceid)
+    public function setReferenceId($referenceId)
     {
-        $this->referenceid = $referenceid;
+        $this->referenceId = $referenceId;
         return $this;
     }
 
     /**
-     * @param string $referencesource
+     * @param string $referenceSource
      * @return StatementDTO
      */
-    public function setReferenceSource($referencesource)
+    public function setReferenceSource($referenceSource)
     {
-        $this->referencesource = $referencesource;
+        $this->referenceSource = $referenceSource;
         return $this;
     }
 

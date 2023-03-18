@@ -49,7 +49,7 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -85,7 +85,7 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, -50)
+            StatementDTO::create($accountId, -50)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw'));
@@ -96,7 +96,7 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
         $statementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 1150)
+            StatementDTO::create($accountId, 1150)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -132,7 +132,7 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
         $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 1401)
+            StatementDTO::create($accountId, 1401)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -156,7 +156,7 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 200)
+            StatementDTO::create($accountId, 200)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -171,8 +171,8 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 150)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
-        $statementId = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::instance($accountId, 350)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 150)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+        $statementId = $this->statementBLL->reserveFundsForWithdraw(StatementDTO::create($accountId, 350)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
 
         // Executar ação
         $this->statementBLL->acceptFundsById($statementId);
@@ -186,13 +186,13 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 150)
+            StatementDTO::create($accountId, 150)
                 ->setDescription( 'Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
             );
         $statementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -239,7 +239,7 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 300));
+        $statementId = $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300));
 
         $this->statementBLL->rejectFundsById($statementId);
     }
@@ -251,13 +251,13 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 150)
+            StatementDTO::create($accountId, 150)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
             );
         $statementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -275,13 +275,13 @@ class ReserveFundsWithdrawTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 150)
+            StatementDTO::create($accountId, 150)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
             );
         $statementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')

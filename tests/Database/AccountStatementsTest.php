@@ -87,7 +87,7 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 10)
+            StatementDTO::create($accountId, 10)
                 ->setDescription( 'Test')
                 ->setReferenceId('Referencia')
                 ->setReferenceSource('Source')
@@ -129,13 +129,13 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 10)
+            StatementDTO::create($accountId, 10)
                 ->setDescription( 'Test')
                 ->setReferenceId('Referencia')
                 ->setReferenceSource('Source')
             );
         $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 50)
+            StatementDTO::create($accountId, 50)
                 ->setDescription('Test')
                 ->setReferenceId('Referencia')
                 ->setReferenceSource('Source')
@@ -211,7 +211,7 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->addFunds(
-            StatementDTO::instance($accountId, 250)
+            StatementDTO::create($accountId, 250)
                 ->setDescription('Test Add Funds')
                 ->setReferenceId('Referencia Add Funds')
                 ->setReferenceSource('Source Add Funds')
@@ -247,7 +247,7 @@ class AccountStatementsTest extends TestCase
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check;
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, -15));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, -15));
     }
 
     public function testWithdrawFunds()
@@ -255,7 +255,7 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 350)
+            StatementDTO::create($accountId, 350)
                 ->setDescription( 'Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -292,7 +292,7 @@ class AccountStatementsTest extends TestCase
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, -15));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, -15));
     }
 
     public function testWithdrawFunds_Negative()
@@ -300,7 +300,7 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
         $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::instance($accountId, 1150)
+            StatementDTO::create($accountId, 1150)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw')
@@ -335,7 +335,7 @@ class AccountStatementsTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 1401)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 1401)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
     /**
@@ -522,9 +522,9 @@ class AccountStatementsTest extends TestCase
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, 400));
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, 200));
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 300));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 400));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 200));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300));
 
         $statementId = $this->accountBLL->closeAccount($accountId);
 
@@ -575,11 +575,11 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->addFunds(StatementDTO::instance($accountId, 400));
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 300));
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 400));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300));
 
         $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
-        $this->statementBLL->addFunds(StatementDTO::instance($ignore, 200));
+        $this->statementBLL->addFunds(StatementDTO::create($ignore, 200));
 
         $startDate = date('Y'). "/" . date('m') . "/01";
         $endDate = (date('Y') + (date('m') == 12 ? 1 : 0)) . "/" . (date('m') == 12 ? 1 : date('m') + 1) . "/01";
@@ -658,11 +658,11 @@ class AccountStatementsTest extends TestCase
     {
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->addFunds(StatementDTO::instance($accountId, 400));
-        $this->statementBLL->withdrawFunds(StatementDTO::instance($accountId, 300));
+        $statementId = $this->statementBLL->addFunds(StatementDTO::create($accountId, 400));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300));
 
         $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
-        $this->statementBLL->addFunds(StatementDTO::instance($ignore, 200));
+        $this->statementBLL->addFunds(StatementDTO::create($ignore, 200));
 
         $accountRepo = $this->accountBLL->getRepository();
 

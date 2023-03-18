@@ -62,6 +62,9 @@ class StatementBLL
     public function addFunds(StatementDTO $dto)
     {
         // Validations
+        if (!$dto->hasAccount()) {
+            throw new StatementException('Account is required');
+        }
         if ($dto->getAmount() <= 0) {
             throw new AmountException('Amount needs to be greater than zero');
         }
@@ -70,9 +73,9 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getaccountId());
+            $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account) || $account->getAccountId() == "") {
-                throw new AccountException("addFunds: Account " . $dto->getaccountId() . " not found");
+                throw new AccountException("addFunds: Account " . $dto->getAccountId() . " not found");
             }
 
             // Update Values in an account
@@ -113,6 +116,10 @@ class StatementBLL
      */
     public function withdrawFunds(StatementDTO $dto)
     {
+        // Validations
+        if (!$dto->hasAccount()) {
+            throw new StatementException('Account is required');
+        }
         if ($dto->getAmount() <= 0) {
             throw new AmountException('Amount needs to be greater than zero');
         }
@@ -120,7 +127,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getaccountId());
+            $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
                 throw new AccountException('addFunds: Account not found');
             }
@@ -137,7 +144,7 @@ class StatementBLL
 
             // Create the Statement
             $statement = new StatementEntity();
-            $statement->setAccountId($dto->getaccountId());
+            $statement->setAccountId($dto->getAccountId());
             $statement->setAmount($dto->getAmount());
             $statement->setTypeId(StatementEntity::WITHDRAW);
             $statement->setDescription($dto->getDescription());
@@ -169,6 +176,9 @@ class StatementBLL
     public function reserveFundsForWithdraw(StatementDTO $dto)
     {
         // Validations
+        if (!$dto->hasAccount()) {
+            throw new StatementException('Account is required');
+        }
         if ($dto->getAmount() <= 0) {
             throw new AmountException('Amount needs to be greater than zero');
         }
@@ -176,7 +186,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getaccountId());
+            $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
                 throw new AccountException('reserveFundsForWithdraw: Account not found');
             }
@@ -193,9 +203,9 @@ class StatementBLL
 
             // Create Statement
             $statement = new StatementEntity();
-            $statement->setAccountId($dto->getaccountId());
+            $statement->setAccountId($dto->getAccountId());
             $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::WITHDRAWBLOCKED);
+            $statement->setTypeId(StatementEntity::WITHDRAW_BLOCKED);
             $statement->setDescription($dto->getDescription());
             $statement->setReferenceId($dto->getReferenceId());
             $statement->setReferenceSource($dto->getReferenceSource());
@@ -225,6 +235,9 @@ class StatementBLL
     public function reserveFundsForDeposit(StatementDTO $dto)
     {
         // Validações
+        if (!$dto->hasAccount()) {
+            throw new StatementException('Account is required');
+        }
         if ($dto->getAmount() <= 0) {
             throw new AmountException('Amount needs to be greater than zero');
         }
@@ -232,7 +245,7 @@ class StatementBLL
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
-            $account = $this->accountRepository->getById($dto->getaccountId());
+            $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
                 throw new AccountException('reserveFundsForDeposit: Account not found');
             }
@@ -244,9 +257,9 @@ class StatementBLL
 
             // Create Statement
             $statement = new StatementEntity();
-            $statement->setAccountId($dto->getaccountId());
+            $statement->setAccountId($dto->getAccountId());
             $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::DEPOSITBLOCKED);
+            $statement->setTypeId(StatementEntity::DEPOSIT_BLOCKED);
             $statement->setDescription($dto->getDescription());
             $statement->setReferenceId($dto->getReferenceId());
             $statement->setReferenceSource($dto->getReferenceSource());
@@ -269,13 +282,16 @@ class StatementBLL
      * Accept a reserved fund and update gross balance
      *
      * @param int $statementId
-     * @param string $description
-     * @param null $code
+     * @param StatementDTO $statementDto
      * @return int Statement ID
      * @throws TransactionException
      */
-    public function acceptFundsById($statementId, $description = null, $code = null)
+    public function acceptFundsById($statementId, $statementDto = null)
     {
+        if (is_null($statementDto)) {
+            $statementDto = StatementDTO::createEmpty();
+        }
+
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
@@ -285,7 +301,7 @@ class StatementBLL
             }
 
             // Validate if statement can be accepted.
-            if ($statement->getTypeId() != StatementEntity::WITHDRAWBLOCKED && $statement->getTypeId() != StatementEntity::DEPOSITBLOCKED) {
+            if ($statement->getTypeId() != StatementEntity::WITHDRAW_BLOCKED && $statement->getTypeId() != StatementEntity::DEPOSIT_BLOCKED) {
                 throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
@@ -294,8 +310,12 @@ class StatementBLL
                 throw new StatementException('The statement has been accepted already');
             }
 
+            if ($statementDto->hasAccount() && $statementDto->getAccountId() != $statement->getAccountId()) {
+                throw new StatementException('The statement account is different from the informed account in the DTO. Try createEmpty().');
+            }
+
             // Get values and apply the updates
-            $signal = $statement->getTypeId() == StatementEntity::DEPOSITBLOCKED ? 1 : -1;
+            $signal = $statement->getTypeId() == StatementEntity::DEPOSIT_BLOCKED ? 1 : -1;
 
             $account = $this->accountRepository->getById($statement->getAccountId());
             $account->setUnCleared($account->getUnCleared() + ($statement->getAmount() * $signal));
@@ -307,14 +327,9 @@ class StatementBLL
             $statement->setStatementParentId($statement->getStatementId());
             $statement->setStatementId(null); // Poder criar um novo registro
             $statement->setDate(null);
-            $statement->setTypeId($statement->getTypeId() == StatementEntity::WITHDRAWBLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
+            $statement->setTypeId($statement->getTypeId() == StatementEntity::WITHDRAW_BLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
             $statement->attachAccount($account);
-            if (!empty($description)) {
-                $statement->setDescription($description);
-            }
-            if (!empty($code)) {
-                $statement->setCode($code);
-            }
+            $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
             $connectionManager->commitTransaction();
@@ -331,23 +346,26 @@ class StatementBLL
      * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
-     * @param string $description
-     * @param null $code
+     * @param StatementDTO $statementDto
      * @return int Statement ID
      * @throws TransactionException
      */
-    public function rejectFundsById($statementId, $description = null, $code = null)
+    public function rejectFundsById($statementId, $statementDto = null)
     {
+        if (is_null($statementDto)) {
+            $statementDto = StatementDTO::createEmpty();
+        }
+
         $connectionManager = new ConnectionManager();
         $connectionManager->beginTransaction();
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
-                throw new StatementException('acceptFundsById: Statement not found');
+                throw new StatementException('rejectFundsById: Statement not found');
             }
 
             // Validate if statement can be accepted.
-            if ($statement->getTypeId() != StatementEntity::WITHDRAWBLOCKED && $statement->getTypeId() != StatementEntity::DEPOSITBLOCKED) {
+            if ($statement->getTypeId() != StatementEntity::WITHDRAW_BLOCKED && $statement->getTypeId() != StatementEntity::DEPOSIT_BLOCKED) {
                 throw new StatementException("The statement id doesn't belongs to a reserved fund.");
             }
 
@@ -356,8 +374,12 @@ class StatementBLL
                 throw new StatementException('The statement has been accepted already');
             }
 
+            if ($statementDto->hasAccount() && $statementDto->getAccountId() != $statement->getAccountId()) {
+                throw new StatementException('The statement account is different from the informed account in the DTO. Try createEmpty().');
+            }
+
             // Update Account
-            $signal = $statement->getTypeId() == StatementEntity::DEPOSITBLOCKED ? -1 : +1;
+            $signal = $statement->getTypeId() == StatementEntity::DEPOSIT_BLOCKED ? -1 : +1;
 
             $account = $this->accountRepository->getById($statement->getAccountId());
             $account->setUnCleared($account->getUnCleared() - ($statement->getAmount() * $signal));
@@ -371,12 +393,7 @@ class StatementBLL
             $statement->setDate(null);
             $statement->setTypeId(StatementEntity::REJECT);
             $statement->attachAccount($account);
-            if (!empty($description)) {
-                $statement->setDescription($description);
-            }
-            if (!empty($code)) {
-                $statement->setCode($code);
-            }
+            $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
             $connectionManager->commitTransaction();
