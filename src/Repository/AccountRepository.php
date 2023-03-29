@@ -24,6 +24,8 @@ class AccountRepository extends BaseRepository
             'accountid'
         );
 
+        $mapper->addFieldMap("entrydate", "entrydate", Mapper::doNotUpdateClosure());
+
         $this->repository = new Repository($dbDriver, $mapper);
     }
 
