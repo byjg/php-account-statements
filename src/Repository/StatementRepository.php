@@ -24,8 +24,6 @@ class StatementRepository extends BaseRepository
             'statementid'
         );
 
-        $mapper->addFieldMap("date", "date", function () { return false; }, function () { return false; });
-
         $this->repository = new Repository($dbDriver, $mapper);
     }
 
