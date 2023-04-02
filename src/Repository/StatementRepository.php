@@ -121,4 +121,45 @@ class StatementRepository extends BaseRepository
 
         return $this->repository->getByQuery($query);
     }
+
+    public function getByCode($accountId, $code, $startDate = null, $endDate = null)
+    {
+        $query = Query::getInstance()
+            ->table($this->repository->getMapper()->getTable())
+            ->where("code = :code", ["code" => $code])
+            ->where("accountid = :id", ["id" => $accountId])
+            ->orderBy(["date"])
+        ;
+
+        if (!empty($startDate)) {
+            $query->where("date >= :start", ["start" => $startDate]);
+        }
+
+        if (!empty($endDate)) {
+            $query->where("date <= :end", ["end" => $endDate]);
+        }
+
+        return $this->repository->getByQuery($query);
+    }
+
+    public function getByReferenceId($accountId, $referenceSource, $referenceId, $startDate = null, $endDate = null)
+    {
+        $query = Query::getInstance()
+            ->table($this->repository->getMapper()->getTable())
+            ->where("referencesource = :source", ["source" => $referenceSource])
+            ->where("referenceid = :id", ["id" => $referenceId])
+            ->where("accountid = :accountid", ["accountid" => $accountId])
+            ->orderBy(["date"])
+        ;
+
+        if (!empty($startDate)) {
+            $query->where("date >= :start", ["start" => $startDate]);
+        }
+
+        if (!empty($endDate)) {
+            $query->where("date <= :end", ["end" => $endDate]);
+        }
+
+        return $this->repository->getByQuery($query);
+    }
 }

@@ -8,6 +8,7 @@ use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
+use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\Serializer\BinderObject;
 use ByJG\Serializer\SerializerObject;
 use DomainException;
@@ -669,7 +670,7 @@ class AccountStatementsTest extends TestCase
         $accountResult = $accountRepo->getByStatementId($statementId);
         $accountExpected = $accountRepo->getById($accountId);
 
-        // Executar teste
+        // Executar testestatementBLL
         $this->assertEquals($accountExpected, $accountResult);
     }
 
@@ -678,6 +679,98 @@ class AccountStatementsTest extends TestCase
         $accountRepo = $this->accountBLL->getRepository();
         $accountResult = $accountRepo->getByStatementId(12345); // Dont exists
         $this->assertNull($accountResult);
+    }
+
+    public function testGetStatementsByCode()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 400)->setCode('TEST'));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300));
+
+        $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
+        $this->statementBLL->addFunds(StatementDTO::create($ignore, 200));
+
+        $statementList = $this->statementBLL->getRepository()->getByCode($accountId, 'TEST');
+
+        // Executar teste
+        $this->assertEquals(
+            [
+                [
+                    'accountid' => $accountId,
+                    'accounttypeid' => 'USDTEST',
+                    'grossbalance' => '1400.00000',
+                    'uncleared' => '0.00000',
+                    'netbalance' => '1400.00000',
+                    'price' => '1.00000',
+                    'statementid' => '3',
+                    'typeid' => 'D',
+                    'amount' => '400.00000',
+                    'description' => '',
+                    'referenceid' => '',
+                    'referencesource' => '',
+                    'statementparentid' => '',
+                    'code' => 'TEST'
+                ],
+            ],
+            array_map(
+                function ($value) {
+                    $value = $value->toArray();
+                    unset($value["date"]);
+                    return $value;
+                },
+                $statementList
+            )
+        );
+
+
+        $statementList = $this->statementBLL->getRepository()->getByCode($accountId, 'NOTFOUND');
+
+        $this->assertEquals([], $statementList);
+
+    }
+
+    public function testGetStatementsByReferenceId()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 400)->setReferenceId('REFID')->setReferenceSource('REFSRC'));
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 300)->setReferenceId('REFID2')->setReferenceSource('REFSRC'));
+
+        $ignore = $this->accountBLL->createAccount('BRLTEST', "___TESTUSER-999", 1000); // I dont want this account
+        $this->statementBLL->addFunds(StatementDTO::create($ignore, 200));
+
+        $statementList = $this->statementBLL->getRepository()->getByReferenceId($accountId, 'REFSRC', 'REFID2');
+
+        // Executar teste
+        $this->assertEquals(
+            [
+                [
+                    'accountid' => $accountId,
+                    'accounttypeid' => 'USDTEST',
+                    'grossbalance' => '1100.00000',
+                    'uncleared' => '0.00000',
+                    'netbalance' => '1100.00000',
+                    'price' => '1.00000',
+                    'statementid' => '4',
+                    'typeid' => 'W',
+                    'amount' => '300.00000',
+                    'description' => '',
+                    'referenceid' => 'REFID2',
+                    'referencesource' => 'REFSRC',
+                    'statementparentid' => '',
+                    'code' => ''
+                ],
+            ],
+            array_map(
+                function ($value) {
+                    $value = $value->toArray();
+                    unset($value["date"]);
+                    return $value;
+                },
+                $statementList
+            )
+        );
     }
 
 }
