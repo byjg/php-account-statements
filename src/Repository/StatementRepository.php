@@ -4,6 +4,7 @@ namespace ByJG\AccountStatements\Repository;
 
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AnyDataset\Db\DbDriverInterface;
+use ByJG\MicroOrm\FieldMapping;
 use ByJG\MicroOrm\Mapper;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\Repository;
@@ -24,7 +25,7 @@ class StatementRepository extends BaseRepository
             'statementid'
         );
 
-        $mapper->addFieldMap("date", "date", Mapper::doNotUpdateClosure());
+        $mapper->addFieldMapping(FieldMapping::create("date")->withUpdateFunction(Mapper::doNotUpdateClosure()));
 
         $this->repository = new Repository($dbDriver, $mapper);
     }
