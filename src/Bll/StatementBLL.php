@@ -9,7 +9,7 @@ use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
-use ByJG\MicroOrm\ConnectionManager;
+use ByJG\MicroOrm\TransactionManager;
 use ByJG\MicroOrm\Exception\TransactionException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
@@ -70,8 +70,8 @@ class StatementBLL
         }
 
         // Get an Account
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account) || $account->getAccountId() == "") {
@@ -96,11 +96,11 @@ class StatementBLL
             // Save to DB
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
@@ -124,8 +124,8 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -155,11 +155,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
@@ -183,8 +183,8 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -214,11 +214,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
@@ -242,8 +242,8 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -268,11 +268,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
@@ -292,8 +292,8 @@ class StatementBLL
             $statementDto = StatementDTO::createEmpty();
         }
 
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
@@ -332,11 +332,11 @@ class StatementBLL
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
@@ -356,8 +356,8 @@ class StatementBLL
             $statementDto = StatementDTO::createEmpty();
         }
 
-        $connectionManager = new ConnectionManager();
-        $connectionManager->beginTransaction();
+        $transactionManager = new TransactionManager();
+        $transactionManager->beginTransaction();
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
@@ -396,11 +396,11 @@ class StatementBLL
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
-            $connectionManager->commitTransaction();
+            $transactionManager->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $connectionManager->rollbackTransaction();
+            $transactionManager->rollbackTransaction();
 
             throw $ex;
         }
