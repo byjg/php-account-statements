@@ -68,12 +68,13 @@ trait BaseDALTrait
     {
         $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:password@127.0.0.1/accounttest";
         $this->uri = new Uri($uriMySqlTest);
-        
+
+        Migration::registerDatabase(MySqlDatabase::class);
+
         $migration = new Migration($this->uri, __DIR__ . "/../db");
-        $migration->registerDatabase("mysql", MySqlDatabase::class);
         $migration->prepareEnvironment();
         $migration->reset();
-        
+
         $this->dbDriver = $migration->getDbDriver();
     }
 
@@ -85,7 +86,7 @@ trait BaseDALTrait
      */
     protected function dbClear()
     {
-        
+
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
