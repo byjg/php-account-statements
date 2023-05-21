@@ -6,7 +6,7 @@ use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\Serializer\BaseModel;
 
 /**
- * @SWG\Definition(
+ * @OA\Definition(
  *   description="Account",
  * )
  *
@@ -16,77 +16,77 @@ class AccountEntity extends BaseModel
 {
     /**
      * @var int
-     * @SWG\Property()
+     * @OA\Property()
      */
-    protected $idaccount;
+    protected $accountid;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
-    protected $idaccounttype;
+    protected $accounttypeid;
 
     /**
-     * @var int
-     * @SWG\Property()
+     * @var string
+     * @OA\Property()
      */
-    protected $iduser;
+    protected $userid;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $grossbalance;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $uncleared;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $netbalance;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $price;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $extra;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $entrydate;
 
     /**
      * @var float
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $minvalue;
 
-    public function getIdAccount()
+    public function getAccountId()
     {
-        return $this->idaccount;
+        return $this->accountid;
     }
 
-    public function getIdAccountType()
+    public function getAccountTypeId()
     {
-        return $this->idaccounttype;
+        return $this->accounttypeid;
     }
 
-    public function getIdUser()
+    public function getUserId()
     {
-        return $this->iduser;
+        return $this->userid;
     }
 
     public function getGrossBalance()
@@ -124,19 +124,19 @@ class AccountEntity extends BaseModel
         return $this->minvalue;
     }
 
-    public function setIdAccount($idaccount)
+    public function setAccountId($accountid)
     {
-        $this->idaccount = $idaccount;
+        $this->accountid = $accountid;
     }
 
-    public function setIdAccountType($idaccounttype)
+    public function setAccountTypeId($accounttypeid)
     {
-        $this->idaccounttype = $idaccounttype;
+        $this->accounttypeid = $accounttypeid;
     }
 
-    public function setIdUser($iduser)
+    public function setUserId($userid)
     {
-        $this->iduser = $iduser;
+        $this->userid = $userid;
     }
 
     public function setGrossBalance($grossbalance)

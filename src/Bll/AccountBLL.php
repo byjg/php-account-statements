@@ -55,54 +55,53 @@ class AccountBLL
 
 
     /**
-     * Obtém um Account pelo seu ID.
-     * Se o ID não for passado, então devolve todos os Accounts.
+     * Get an account by ID.
      *
-     * @param int $idAccount Opcional. Se não for passado obtém todos
+     * @param int $accountId Optional id empty return all. 
      * @return AccountEntity|AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getById($idAccount)
+    public function getById($accountId)
     {
         
-        return $this->accountRepository->getById($idAccount);
+        return $this->accountRepository->getById($accountId);
     }
 
     /**
-     * Obtém uma lista  AccountEntity pelo Id do Usuário
+     * Obtém uma lista AccountEntity pelo Id do Usuário
      *
-     * @param int $idUser
+     * @param string $userId
      * @param string $accountType Tipo de conta
      * @return AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUserId($idUser, $accountType = "")
+    public function getByUserId($userId, $accountType = "")
     {
         
 
-        return $this->accountRepository->getUserId($idUser, $accountType);
+        return $this->accountRepository->getByUserId($userId, $accountType);
     }
 
     /**
      * Obtém uma lista  AccountEntity pelo Account Type ID
      *
-     * @param int $idAccountType
+     * @param int $accountTypeId
      * @return AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getAccountTypeId($idAccountType)
+    public function getByAccountTypeId($accountTypeId)
     {
-        return $this->accountRepository->getAccountTypeId($idAccountType);
+        return $this->accountRepository->getByAccountTypeId($accountTypeId);
     }
 
     /**
      * Cria uma nova conta no sistema
      *
-     * @param string $idAccountType
-     * @param int $idUser
+     * @param string $accountTypeId
+     * @param string $userId
      * @param float $balance
      * @param float|int $price
      * @param int $minValue
@@ -117,17 +116,17 @@ class AccountBLL
      * @throws AmountException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function createAccount($idAccountType, $idUser, $balance, $price = 1, $minValue = 0, $extra = null)
+    public function createAccount($accountTypeId, $userId, $balance, $price = 1, $minValue = 0, $extra = null)
     {
         // Faz as validações
-        if ($this->accountTypeBLL->getById($idAccountType) == null) {
-            throw new AccountTypeException('IdAccountType ' . $idAccountType . ' não existe');
+        if ($this->accountTypeBLL->getById($accountTypeId) == null) {
+            throw new AccountTypeException('AccountTypeId ' . $accountTypeId . ' não existe');
         }
 
         // Define os dados
         $model = new AccountEntity();
-        $model->setIdAccountType($idAccountType);
-        $model->setIdUser($idUser);
+        $model->setAccountTypeId($accountTypeId);
+        $model->setUserId($userId);
         $model->setGrossBalance(0);
         $model->setNetBalance(0);
         $model->setUncleared(0);
@@ -139,28 +138,28 @@ class AccountBLL
         
         try {
             $result = $this->accountRepository->save($model);
-            $idAccount = $result->getIdAccount();
+            $accountId = $result->getAccountId();
         } catch (PDOException $ex) {
             if (strpos($ex->getMessage(), "Duplicate entry") !== false) {
-                throw new AccountException("Usuário $idUser já possui uma conta do tipo $idAccountType");
+                throw new AccountException("Usuário $userId já possui uma conta do tipo $accountTypeId");
             } else {
                 throw $ex;
             }
         }
 
         if ($balance > 0) {
-            $this->statementBLL->addFunds(StatementDTO::instance($idAccount, $balance)->setDescription("Opening Balance")->setCode('BAL'));
+            $this->statementBLL->addFunds(StatementDTO::create($accountId, $balance)->setDescription("Opening Balance")->setCode('BAL'));
         } elseif ($balance < 0) {
-            $this->statementBLL->withdrawFunds(StatementDTO::instance($idAccount, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
+            $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 
-        return $idAccount;
+        return $accountId;
     }
 
     /**
      * Reinicia o balanço
      *
-     * @param int $idAccount
+     * @param int $accountId
      * @param float $newBalance
      * @param float|int $newPrice
      * @param float|int $newMinValue
@@ -169,14 +168,14 @@ class AccountBLL
      * @return int
      */
     public function overrideBalance(
-        $idAccount,
+        $accountId,
         $newBalance,
         $newPrice = 1,
         $newMinValue = 0,
         $description = "Reset Balance"
     ) {
         
-        $model = $this->accountRepository->getById($idAccount);
+        $model = $this->accountRepository->getById($accountId);
 
         if (empty($model)) {
             throw new AccountException('Id da conta não existe. Não é possível fechar a conta');
@@ -185,7 +184,7 @@ class AccountBLL
         // Get total value reserved
         $unclearedValues = 0;
         $qtd = 0;
-        $object = $this->statementBLL->getUnclearedStatements($model->getIdAccount());
+        $object = $this->statementBLL->getUnclearedStatements($model->getAccountId());
         foreach ($object as $stmt) {
             $qtd++;
             $unclearedValues += $stmt->getAmount();
@@ -209,34 +208,34 @@ class AccountBLL
         // Create new Statement
         $statement = new StatementEntity();
         $statement->setAmount($newBalance);
-        $statement->setIdAccount($model->getIdAccount());
+        $statement->setAccountId($model->getAccountId());
         $statement->setDescription(empty($description) ? "Reset Balance" : $description);
-        $statement->setIdType(StatementEntity::BALANCE);
+        $statement->setTypeId(StatementEntity::BALANCE);
         $statement->setCode('BAL');
         $statement->setGrossBalance($newBalance);
         $statement->setNetBalance($newBalance - $unclearedValues);
         $statement->setUnCleared($unclearedValues);
         $statement->setPrice($newPrice);
-        $statement->setIdAccountType($model->getIdAccountType());
+        $statement->setAccountTypeId($model->getAccountTypeId());
         $this->statementBLL->getRepository()->save($statement);
 
-        return $statement->getIdStatement();
+        return $statement->getStatementId();
     }
 
     /**
      * Encerra (Zera) uma conta
      *
-     * @param int $idAccount
+     * @param int $accountId
      * @return int
      * @throws Exception
      */
-    public function closeAccount($idAccount)
+    public function closeAccount($accountId)
     {
-        return $this->overrideBalance($idAccount, 0, 0, 0);
+        return $this->overrideBalance($accountId, 0, 0, 0);
     }
 
     /**
-     * @param $idaccount
+     * @param $accountId
      * @param $balance
      * @param string $description
      * @return int
@@ -245,18 +244,23 @@ class AccountBLL
      * @throws AmountException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function partialBalance($idaccount, $balance, $description = "Partial Balance")
+    public function partialBalance($accountId, $balance, $description = "Partial Balance")
     {
-        $account = $this->getById($idaccount);
+        $account = $this->getById($accountId);
 
         $amount = $balance - $account->getNetBalance();
 
         if ($amount > 0) {
-            $idStatement = $this->statementBLL->addFunds(StatementDTO::instance($idaccount, $amount)->setDescription($description));
+            $statementId = $this->statementBLL->addFunds(StatementDTO::create($accountId, $amount)->setDescription($description));
         } elseif ($amount < 0) {
-            $idStatement = $this->statementBLL->withdrawFunds(StatementDTO::instance($idaccount, abs($amount))->setDescription($description));
+            $statementId = $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($amount))->setDescription($description));
         }
 
-        return $idStatement;
+        return $statementId;
+    }
+
+    public function getRepository()
+    {
+        return $this->accountRepository;
     }
 }

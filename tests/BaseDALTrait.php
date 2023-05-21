@@ -66,13 +66,15 @@ trait BaseDALTrait
      */
     public function dbSetUp()
     {
-        $this->uri = new Uri("mysql://root:password@127.0.0.1/accounttest");
-        
+        $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:password@127.0.0.1/accounttest";
+        $this->uri = new Uri($uriMySqlTest);
+
+        Migration::registerDatabase(MySqlDatabase::class);
+
         $migration = new Migration($this->uri, __DIR__ . "/../db");
-        $migration->registerDatabase("mysql", MySqlDatabase::class);
         $migration->prepareEnvironment();
         $migration->reset();
-        
+
         $this->dbDriver = $migration->getDbDriver();
     }
 
@@ -84,21 +86,21 @@ trait BaseDALTrait
      */
     protected function dbClear()
     {
-        
+
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            'WHERE account.idaccount = statement.idaccount and account.iduser < 0 and idstatementparent is not null;'
+            "WHERE account.accountid = statement.accountid and account.userid like '___TESTUSER-%' and statementparentid is not null;"
         );
 
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .
-            'WHERE account.idaccount = statement.idaccount and account.iduser < 0'
+            "WHERE account.accountid = statement.accountid and account.userid like '___TESTUSER-%'"
         );
 
-        $this->dbDriver->execute('DELETE FROM `account` where account.iduser < 0');
+        $this->dbDriver->execute("DELETE FROM `account` where account.userid like '___TESTUSER-%'");
 
-        $this->dbDriver->execute("DELETE FROM `accounttype` WHERE idaccounttype like '___TEST'");
+        $this->dbDriver->execute("DELETE FROM `accounttype` WHERE accounttypeid like '___TEST'");
     }
 
     /**
@@ -114,21 +116,21 @@ trait BaseDALTrait
     protected function createDummyData()
     {
         $dto1 = new AccountTypeEntity();
-        $dto1->setIdAccountType('USDTEST');
+        $dto1->setAccountTypeId('USDTEST');
         $dto1->setName('Test 1');
 
         $dto2 = new AccountTypeEntity();
-        $dto2->setIdAccountType('BRLTEST');
+        $dto2->setAccountTypeId('BRLTEST');
         $dto2->setName('Test 2');
 
         $dto3 = new AccountTypeEntity();
-        $dto3->setIdAccountType('ABCTEST');
+        $dto3->setAccountTypeId('ABCTEST');
         $dto3->setName('Test 3');
 
         $this->accountTypeBLL->update($dto1);
         $this->accountTypeBLL->update($dto2);
         $this->accountTypeBLL->update($dto3);
 
-        $this->accountBLL->createAccount('BRLTEST', -1, 1000, 1);
+        $this->accountBLL->createAccount('BRLTEST', '___TESTUSER-1', 1000, 1);
     }
 }

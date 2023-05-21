@@ -5,3 +5,4 @@ vendor
 /src/*.db
 node_modules
 .usdocker
+.phpunit.result.cache

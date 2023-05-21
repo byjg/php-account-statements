@@ -6,35 +6,62 @@ namespace ByJG\AccountStatements\DTO;
 
 class StatementDTO
 {
-    protected $idaccount;
+    protected $accountId;
     protected $amount;
 
     protected $description = null;
-    protected $reference = null;
+    protected $referenceId = null;
+    protected $referenceSource = null;
     protected $code = null;
 
     /**
      * StatementDTO constructor.
-     * @param $idaccount
+     * @param $accountId
      * @param $amount
      */
-    public function __construct($idaccount, $amount)
+    public function __construct($accountId, $amount)
     {
-        $this->idaccount = $idaccount;
+        $this->accountId = $accountId;
         $this->amount = $amount;
     }
 
-    public static function instance($idaccount, $amount)
+    public static function create($accountId, $amount)
     {
-        return new StatementDTO($idaccount, $amount);
+        return new StatementDTO($accountId, $amount);
+    }
+
+    public static function createEmpty()
+    {
+        return new StatementDTO(null, null);
+    }
+
+    public function hasAccount()
+    {
+        return !empty($this->accountId) && !empty($this->amount);
+    }
+
+    public function setToStatement($statement)
+    {
+        if (!empty($this->getDescription())) {
+            $statement->setDescription($this->getDescription());
+        }
+        if (!empty($this->getCode())) {
+            $statement->setCode($this->getCode());
+        }
+        if (!empty($this->getReferenceId())) {
+            $statement->setReferenceId($this->getReferenceId());
+        }
+        if (!empty($this->getReferenceSource())) {
+            $statement->setReferenceSource($this->getReferenceSource());
+        }
     }
 
     /**
      * @return mixed
      */
-    public function getIdaccount()
+    public function getAccountId()
     {
-        return $this->idaccount;
+        return $this->accountId;
     }
 
     /**
@@ -56,9 +83,17 @@ class StatementDTO
     /**
      * @return string
      */
-    public function getReference()
+    public function getReferenceId()
     {
-        return $this->reference;
+        return $this->referenceId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReferenceSource()
+    {
+        return $this->referenceSource;
     }
 
     /**
@@ -80,12 +115,22 @@ class StatementDTO
     }
 
     /**
-     * @param string $reference
+     * @param string $referenceId
      * @return StatementDTO
      */
-    public function setReference($reference)
+    public function setReferenceId($referenceId)
     {
-        $this->reference = $reference;
+        $this->referenceId = $referenceId;
+        return $this;
+    }
+
+    /**
+     * @param string $referenceSource
+     * @return StatementDTO
+     */
+    public function setReferenceSource($referenceSource)
+    {
+        $this->referenceSource = $referenceSource;
         return $this;
     }
 

@@ -6,7 +6,7 @@ use ByJG\Serializer\BaseModel;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 
 /**
- * @SWG\Definition(
+ * @OA\Definition(
  *   description="Rollback",
  * )
  *
@@ -17,19 +17,19 @@ class RollbackEntity extends BaseModel
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $class;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $method;
 
     /**
      * @var string
-     * @SWG\Property()
+     * @OA\Property()
      */
     protected $args = [];
 

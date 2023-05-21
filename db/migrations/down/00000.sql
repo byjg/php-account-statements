@@ -1,2 +1,2 @@
 ALTER TABLE `account`
-CHANGE COLUMN `iduser` `iduser` INT(11) NOT NULL ;
+CHANGE COLUMN `userid` `userid` INT(11) NOT NULL ;
