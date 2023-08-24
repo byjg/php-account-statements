@@ -6,6 +6,7 @@
   "license": "MIT",
   "require": {
     "ext-pdo": "*",
+    "ext-openssl": "*",
     "byjg/micro-orm": "4.9.*"
   },
   "autoload": {

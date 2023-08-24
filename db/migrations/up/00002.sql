@@ -1,5 +1,5 @@
 ALTER TABLE `statement`
-    ADD COLUMN `code` CHAR(5) NULL AFTER `netbalance`;
+    ADD COLUMN `code` CHAR(10) NULL AFTER `netbalance`;
 
 ALTER TABLE `statement`
     RENAME COLUMN `reference` TO `referenceid`;
