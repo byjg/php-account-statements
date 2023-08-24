@@ -269,7 +269,7 @@ class AccountBLL
         $statementSourceDTO->setAmount($amount);
         $statementSourceDTO->setCode('T_TO');
         $statementSourceDTO->setReferenceSource('transfer_to');
-        $statementSourceDTO->setReferenceId("$accountTarget:$refSource");
+        $statementSourceDTO->setReferenceId($refSource);
         $statementSourceDTO->setDescription('Transfer to account id ' . $accountTarget);
 
         $statementTargetDTO = StatementDTO::createEmpty();
@@ -277,7 +277,7 @@ class AccountBLL
         $statementTargetDTO->setAmount($amount);
         $statementTargetDTO->setCode('T_FROM');
         $statementTargetDTO->setReferenceSource('transfer_from');
-        $statementTargetDTO->setReferenceId("$accountSource:$refSource");
+        $statementTargetDTO->setReferenceId($refSource);
         $statementTargetDTO->setDescription('Transfer from account id ' . $accountSource);
 
         $statementSourceId = $this->statementBLL->withdrawFunds($statementSourceDTO);
