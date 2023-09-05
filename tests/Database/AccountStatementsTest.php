@@ -124,6 +124,42 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
+    public function testGetById_Zero()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 0);
+        $statementId = $this->statementBLL->addFunds(
+            StatementDTO::create($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+                ->setCode('XYZ')
+        );
+
+        // Objeto que é esperado
+        $statement = new StatementEntity();
+        $statement->setAmount('10.00000');
+        $statement->setDate('2015-01-24');
+        $statement->setDescription('Test');
+        $statement->setGrossBalance('10.00000');
+        $statement->setAccountId($accountId);
+        $statement->setStatementId($statementId);
+        $statement->setTypeId('D');
+        $statement->setNetBalance('10.00000');
+        $statement->setPrice('1.00000');
+        $statement->setUnCleared('0.00000');
+        $statement->setReferenceId('Referencia');
+        $statement->setReferenceSource('Source');
+        $statement->setCode('XYZ');
+        $statement->setAccountTypeId('USDTEST');
+
+        $actual = $this->statementBLL->getById($statementId);
+        $statement->setDate($actual->getDate());
+
+        // Executar teste
+        $this->assertEquals($statement->toArray(), $actual->toArray());
+    }
+
     public function testGetById_NotFound()
     {
         // Executar teste

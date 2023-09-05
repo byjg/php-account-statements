@@ -148,9 +148,9 @@ class AccountBLL
             }
         }
 
-        if ($balance > 0) {
+        if ($balance >= 0) {
             $this->statementBLL->addFunds(StatementDTO::create($accountId, $balance)->setDescription("Opening Balance")->setCode('BAL'));
-        } elseif ($balance < 0) {
+        } else {
             $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 
@@ -251,9 +251,9 @@ class AccountBLL
 
         $amount = $balance - $account->getNetBalance();
 
-        if ($amount > 0) {
+        if ($amount >= 0) {
             $statementId = $this->statementBLL->addFunds(StatementDTO::create($accountId, $amount)->setDescription($description));
-        } elseif ($amount < 0) {
+        } else {
             $statementId = $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($amount))->setDescription($description));
         }
 

@@ -65,8 +65,8 @@ class StatementBLL
         if (!$dto->hasAccount()) {
             throw new StatementException('Account is required');
         }
-        if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount needs to be greater than zero');
+        if ($dto->getAmount() < 0) {
+            throw new AmountException('Amount needs to be greater or equal than zero');
         }
 
         // Get an Account

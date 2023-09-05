@@ -37,7 +37,7 @@ class StatementDTO
 
     public function hasAccount()
     {
-        return !empty($this->accountId) && !empty($this->amount);
+        return !empty($this->accountId) && ($this->amount === 0 || !empty($this->amount));
     }
 
     public function setToStatement($statement)
