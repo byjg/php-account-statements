@@ -81,7 +81,16 @@ vendor/bin/phpunit
 ```
 
 
+## Dependencies  
 
+```mermaid  
+flowchart TD  
+    byjg/account-statements --> ext-openssl
+    byjg/account-statements --> byjg/micro-orm
+```
+
+----  
+[Open source ByJG](http://opensource.byjg.com)
 
 @todo Documentation
 @todo Rest
