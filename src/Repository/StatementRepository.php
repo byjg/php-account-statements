@@ -16,8 +16,9 @@ class StatementRepository extends BaseRepository
      * StatementRepository constructor.
      *
      * @param DbDriverInterface $dbDriver
+     * @param FieldMapping[] $fieldMappingList
      */
-    public function __construct(DbDriverInterface $dbDriver)
+    public function __construct(DbDriverInterface $dbDriver, array $fieldMappingList = [])
     {
         $mapper = new Mapper(
             StatementEntity::class,
@@ -26,6 +27,9 @@ class StatementRepository extends BaseRepository
         );
 
         $mapper->addFieldMapping(FieldMapping::create("date")->withUpdateFunction(Mapper::doNotUpdateClosure()));
+        foreach ($fieldMappingList as $fieldMapping) {
+            $mapper->addFieldMapping($fieldMapping);
+        }
 
         $this->repository = new Repository($dbDriver, $mapper);
     }
