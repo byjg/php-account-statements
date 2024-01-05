@@ -6,8 +6,8 @@ namespace ByJG\AccountStatements\DTO;
 
 class StatementDTO
 {
-    protected $accountId;
-    protected $amount;
+    protected $accountId = null;
+    protected $amount = null;
 
     protected $description = null;
     protected $referenceId = null;
@@ -37,7 +37,7 @@ class StatementDTO
 
     public function hasAccount()
     {
-        return !empty($this->accountId) && !empty($this->amount);
+        return !empty($this->accountId) && ($this->amount === 0 || !empty($this->amount));
     }
 
     public function setToStatement($statement)
@@ -102,6 +102,18 @@ class StatementDTO
     public function getCode()
     {
         return $this->code;
+    }
+
+    public function setAccountId($accountId)
+    {
+        $this->accountId = $accountId;
+        return $this;
+    }
+
+    public function setAmount($amount)
+    {
+        $this->amount = $amount;
+        return $this;
     }
 
     /**

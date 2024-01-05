@@ -18,6 +18,7 @@ use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\MicroOrm\TransactionManager;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
 use PDOException;
@@ -147,9 +148,9 @@ class AccountBLL
             }
         }
 
-        if ($balance > 0) {
+        if ($balance >= 0) {
             $this->statementBLL->addFunds(StatementDTO::create($accountId, $balance)->setDescription("Opening Balance")->setCode('BAL'));
-        } elseif ($balance < 0) {
+        } else {
             $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 
@@ -250,13 +251,39 @@ class AccountBLL
 
         $amount = $balance - $account->getNetBalance();
 
-        if ($amount > 0) {
+        if ($amount >= 0) {
             $statementId = $this->statementBLL->addFunds(StatementDTO::create($accountId, $amount)->setDescription($description));
-        } elseif ($amount < 0) {
+        } else {
             $statementId = $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($amount))->setDescription($description));
         }
 
         return $statementId;
+    }
+
+    public function transferFunds($accountSource, $accountTarget, $amount)
+    {
+        $refSource = bin2hex(openssl_random_pseudo_bytes(16));
+
+        $statementSourceDTO = StatementDTO::createEmpty();
+        $statementSourceDTO->setAccountId($accountSource);
+        $statementSourceDTO->setAmount($amount);
+        $statementSourceDTO->setCode('T_TO');
+        $statementSourceDTO->setReferenceSource('transfer_to');
+        $statementSourceDTO->setReferenceId($refSource);
+        $statementSourceDTO->setDescription('Transfer to account id ' . $accountTarget);
+
+        $statementTargetDTO = StatementDTO::createEmpty();
+        $statementTargetDTO->setAccountId($accountTarget);
+        $statementTargetDTO->setAmount($amount);
+        $statementTargetDTO->setCode('T_FROM');
+        $statementTargetDTO->setReferenceSource('transfer_from');
+        $statementTargetDTO->setReferenceId($refSource);
+        $statementTargetDTO->setDescription('Transfer from account id ' . $accountSource);
+
+        $statementSourceId = $this->statementBLL->withdrawFunds($statementSourceDTO);
+        $statementTargetId = $this->statementBLL->addFunds($statementTargetDTO);
+
+        return [ $statementSourceId, $statementTargetId ];
     }
 
     public function getRepository()

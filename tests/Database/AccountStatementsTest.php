@@ -3,6 +3,11 @@
 namespace Test;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
+use ByJG\AccountStatements\Exception\AccountException;
+use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
+use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\TransactionException;
 use Test\BaseDALTrait;
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
@@ -105,6 +110,42 @@ class AccountStatementsTest extends TestCase
         $statement->setStatementId($statementId);
         $statement->setTypeId('W');
         $statement->setNetBalance('990.00000');
+        $statement->setPrice('1.00000');
+        $statement->setUnCleared('0.00000');
+        $statement->setReferenceId('Referencia');
+        $statement->setReferenceSource('Source');
+        $statement->setCode('XYZ');
+        $statement->setAccountTypeId('USDTEST');
+
+        $actual = $this->statementBLL->getById($statementId);
+        $statement->setDate($actual->getDate());
+
+        // Executar teste
+        $this->assertEquals($statement->toArray(), $actual->toArray());
+    }
+
+    public function testGetById_Zero()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 0);
+        $statementId = $this->statementBLL->addFunds(
+            StatementDTO::create($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+                ->setCode('XYZ')
+        );
+
+        // Objeto que é esperado
+        $statement = new StatementEntity();
+        $statement->setAmount('10.00000');
+        $statement->setDate('2015-01-24');
+        $statement->setDescription('Test');
+        $statement->setGrossBalance('10.00000');
+        $statement->setAccountId($accountId);
+        $statement->setStatementId($statementId);
+        $statement->setTypeId('D');
+        $statement->setNetBalance('10.00000');
         $statement->setPrice('1.00000');
         $statement->setUnCleared('0.00000');
         $statement->setReferenceId('Referencia');
@@ -382,14 +423,14 @@ class AccountStatementsTest extends TestCase
     }
 
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @throws AmountException
+     * @throws AccountException
+     * @throws AccountTypeException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\OrmBeforeInvalidException
-     * @throws \ByJG\MicroOrm\Exception\OrmInvalidFieldsException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws TransactionException
      * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function testGetAccountByAccountType()
     {
@@ -773,4 +814,28 @@ class AccountStatementsTest extends TestCase
         );
     }
 
+    public function testTransferFunds()
+    {
+        $accountBrlId = $this->accountBLL->getByAccountTypeId('BRLTEST')[0]->getAccountId();
+        $accountUsdId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+
+        [ $statementSourceId, $statementTargetId ] = $this->accountBLL->transferFunds($accountBrlId, $accountUsdId, 300);
+
+        $accountSource = $this->accountBLL->getById($accountBrlId);
+        $accountTarget = $this->accountBLL->getById($accountUsdId);
+
+        $this->assertEquals(700, $accountSource->getNetBalance());
+        $this->assertEquals(1300, $accountTarget->getNetBalance());
+    }
+
+    public function testTransferFundsFail()
+    {
+        $accountBrlId = $this->accountBLL->getByAccountTypeId('BRLTEST')[0]->getAccountId();
+        $accountUsdId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Cannot withdraw above the account balance');
+
+        [ $statementSourceId, $statementTargetId ] = $this->accountBLL->transferFunds($accountBrlId, $accountUsdId, 1100);
+    }
 }

@@ -1,5 +1,11 @@
 # Basic PHP Account Statements
 
+[![Build Status](https://github.com/byjg/php-account-statements/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-account-statements/actions/workflows/phpunit.yml)
+[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
+[![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-account-statements/)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-account-statements.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub release](https://img.shields.io/github/release/byjg/php-account-statements.svg)](https://github.com/byjg/php-account-statements/releases/)
+
 This is a simple PHP application that allows you to create and manage account statements. It consists of a set of classes to allow control and get statements of any account.
 
 It supports the following features:
@@ -8,7 +14,9 @@ It supports the following features:
 - Multiple currencies per account
 - Transaction history to avoid changes in the balance;
 
-## Basic usage
+## How to use
+
+### Basic usage
 
 ```php
 use ByJG\AccountStatements\Bll\AccountBLL;
@@ -69,8 +77,20 @@ composer require byjg/account-statements
 
 ```bash
 docker run --name mysql-container --rm  -e MYSQL_ROOT_PASSWORD=password -p 3306:3306 -d mysql:8.0
-vendor/bin/phpunit
+./vendor/bin/phpunit
 ```
+
+
+## Dependencies  
+
+```mermaid  
+flowchart TD  
+    byjg/account-statements --> ext-openssl
+    byjg/account-statements --> byjg/micro-orm
+```
+
+----  
+[Open source ByJG](http://opensource.byjg.com)
 
 @todo Documentation
 @todo Rest
