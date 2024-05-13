@@ -114,7 +114,7 @@ class StatementBLL
      * @throws AmountException
      * @throws TransactionException
      */
-    public function withdrawFunds(StatementDTO $dto)
+    public function withdrawFunds(StatementDTO $dto, $allowZeroNoBalance = false)
     {
         // Validations
         if (!$dto->hasAccount()) {
@@ -133,8 +133,12 @@ class StatementBLL
             }
 
             // Cannot withdraw above the account balance.
-            if ($account->getNetBalance() - $dto->getAmount() < $account->getMinValue()) {
-                throw new AmountException('Cannot withdraw above the account balance.');
+            $newBalance = $account->getNetBalance() - $dto->getAmount();
+            if ($newBalance < $account->getMinValue()) {
+                if (!$allowZeroNoBalance) {
+                    throw new AmountException('Cannot withdraw above the account balance.');
+                }
+                $dto->setAmount($account->getNetBalance() - $account->getMinValue());
             }
 
             // Update balances
