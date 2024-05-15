@@ -900,14 +900,19 @@ class AccountStatementsTest extends TestCase
         $this->expectException(TransactionStartedException::class);
         $this->expectExceptionMessage('You cannot join a transaction with a different isolation level');
 
-        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $statementId = $this->statementBLL->withdrawFunds(
-            StatementDTO::create($accountId, 10)
-                ->setDescription( 'Test')
-                ->setReferenceId('Referencia')
-                ->setReferenceSource('Source')
-                ->setCode('XYZ')
-        );
+        try {
+            $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+            $statementId = $this->statementBLL->withdrawFunds(
+                StatementDTO::create($accountId, 10)
+                    ->setDescription('Test')
+                    ->setReferenceId('Referencia')
+                    ->setReferenceSource('Source')
+                    ->setCode('XYZ')
+            );
+        }
+        finally {
+            $this->dbDriver->rollbackTransaction();
+        }
 
     }
 
