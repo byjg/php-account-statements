@@ -83,4 +83,9 @@ abstract class BaseRepository
     {
         return $this->repository->save($model);
     }
+
+    public function getDbDriver()
+    {
+        return $this->repository->getDbDriver();
+    }
 }

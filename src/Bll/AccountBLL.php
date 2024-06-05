@@ -18,7 +18,6 @@ use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\TransactionException;
-use ByJG\MicroOrm\TransactionManager;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
 use PDOException;

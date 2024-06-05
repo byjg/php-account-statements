@@ -5,6 +5,8 @@ namespace Test;
 use ByJG\AccountStatements\DTO\StatementDTO;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\AnyDataset\Db\Exception\TransactionStartedException;
+use ByJG\AnyDataset\Db\IsolationLevelEnum;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\TransactionException;
@@ -51,12 +53,9 @@ class AccountStatementsTest extends TestCase
     }
 
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return void
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function testGetAccountType()
     {
@@ -380,15 +379,27 @@ class AccountStatementsTest extends TestCase
         $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 1401)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
+    public function testWithdrawFunds_NegativeInvalid_AllowZero()
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000, 1, -400);
+        $id = $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 1401)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'), true);
+
+        $statement = $this->statementBLL->getById($id);
+        $this->assertEquals(-400, $statement->getNetBalance());
+        $this->assertEquals(1400, $statement->getAmount());
+    }
+
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @return void
+     * @throws AccountException
+     * @throws AccountTypeException
+     * @throws AmountException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws TransactionException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\OrmBeforeInvalidException
-     * @throws \ByJG\MicroOrm\Exception\OrmInvalidFieldsException
      * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function testGetAccountByUserId()
     {
@@ -838,4 +849,71 @@ class AccountStatementsTest extends TestCase
 
         [ $statementSourceId, $statementTargetId ] = $this->accountBLL->transferFunds($accountBrlId, $accountUsdId, 1100);
     }
+
+    public function testJoinTransactionAndCommit()
+    {
+        // This transaction starts outside the Statement Context
+        $this->dbDriver->beginTransaction(IsolationLevelEnum::SERIALIZABLE);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::create($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+                ->setCode('XYZ')
+        );
+
+        // Needs to commit inside the context
+        $this->dbDriver->commitTransaction();
+
+        $statement = $this->statementBLL->getById($statementId);
+        $this->assertNotNull($statement);
+    }
+
+    public function testJoinTransactionAndRollback()
+    {
+        // This transaction starts outside the Statement Context
+        $this->dbDriver->beginTransaction(IsolationLevelEnum::SERIALIZABLE);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $statementId = $this->statementBLL->withdrawFunds(
+            StatementDTO::create($accountId, 10)
+                ->setDescription( 'Test')
+                ->setReferenceId('Referencia')
+                ->setReferenceSource('Source')
+                ->setCode('XYZ')
+        );
+
+        // Needs to commit inside the context
+        $this->dbDriver->rollbackTransaction();
+
+        $statement = $this->statementBLL->getById($statementId);
+        $this->assertNull($statement);
+    }
+
+    public function testJoinTransactionDifferentIsolationLevel()
+    {
+        // This transaction starts outside the Statement Context
+        $this->dbDriver->beginTransaction(IsolationLevelEnum::READ_UNCOMMITTED);
+
+        $this->expectException(TransactionStartedException::class);
+        $this->expectExceptionMessage('You cannot join a transaction with a different isolation level');
+
+        try {
+            $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+            $statementId = $this->statementBLL->withdrawFunds(
+                StatementDTO::create($accountId, 10)
+                    ->setDescription('Test')
+                    ->setReferenceId('Referencia')
+                    ->setReferenceSource('Source')
+                    ->setCode('XYZ')
+            );
+        }
+        finally {
+            $this->dbDriver->rollbackTransaction();
+        }
+
+    }
+
 }

@@ -9,7 +9,7 @@ use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
-use ByJG\MicroOrm\TransactionManager;
+use ByJG\AnyDataset\Db\IsolationLevelEnum;
 use ByJG\MicroOrm\Exception\TransactionException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 use Exception;
@@ -70,8 +70,7 @@ class StatementBLL
         }
 
         // Get an Account
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account) || $account->getAccountId() == "") {
@@ -96,11 +95,11 @@ class StatementBLL
             // Save to DB
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
@@ -114,7 +113,7 @@ class StatementBLL
      * @throws AmountException
      * @throws TransactionException
      */
-    public function withdrawFunds(StatementDTO $dto)
+    public function withdrawFunds(StatementDTO $dto, $allowZeroNoBalance = false)
     {
         // Validations
         if (!$dto->hasAccount()) {
@@ -124,8 +123,7 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -133,8 +131,12 @@ class StatementBLL
             }
 
             // Cannot withdraw above the account balance.
-            if ($account->getNetBalance() - $dto->getAmount() < $account->getMinValue()) {
-                throw new AmountException('Cannot withdraw above the account balance.');
+            $newBalance = $account->getNetBalance() - $dto->getAmount();
+            if ($newBalance < $account->getMinValue()) {
+                if (!$allowZeroNoBalance) {
+                    throw new AmountException('Cannot withdraw above the account balance.');
+                }
+                $dto->setAmount($account->getNetBalance() - $account->getMinValue());
             }
 
             // Update balances
@@ -155,11 +157,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
@@ -183,8 +185,7 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -214,11 +215,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
@@ -242,8 +243,7 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (is_null($account)) {
@@ -268,11 +268,11 @@ class StatementBLL
 
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
@@ -292,8 +292,7 @@ class StatementBLL
             $statementDto = StatementDTO::createEmpty();
         }
 
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
@@ -332,11 +331,11 @@ class StatementBLL
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
@@ -356,8 +355,7 @@ class StatementBLL
             $statementDto = StatementDTO::createEmpty();
         }
 
-        $transactionManager = new TransactionManager();
-        $transactionManager->beginTransaction();
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
@@ -396,11 +394,11 @@ class StatementBLL
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
-            $transactionManager->commitTransaction();
+            $this->getRepository()->getDbDriver()->commitTransaction();
 
             return $result->getStatementId();
         } catch (Exception $ex) {
-            $transactionManager->rollbackTransaction();
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
         }
