@@ -28,12 +28,11 @@ class AccountTypeBLL
      * Obtém um AccountType por ID.
      * Se o ID não for passado, então devolve todos os AccountTypes.
      *
-     * @param int|string $accountTypeId Opcional. Se não for passado obtém todos
+     * @param int $accountTypeId Opcional. Se não for passado obtém todos
      * @return AccountTypeEntity|AccountTypeEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getById($accountTypeId)
+    public function getById(string $accountTypeId): array|AccountTypeEntity
     {
         return $this->accountTypeRepository->getById($accountTypeId);
     }

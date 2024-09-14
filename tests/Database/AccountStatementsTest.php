@@ -1,30 +1,21 @@
 <?php
 
-namespace Test;
+namespace Tests\Database;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
+use ByJG\AccountStatements\Entity\AccountEntity;
+use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AnyDataset\Db\Exception\TransactionStartedException;
 use ByJG\AnyDataset\Db\IsolationLevelEnum;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\TransactionException;
-use Test\BaseDALTrait;
-use ByJG\AccountStatements\Entity\AccountEntity;
-use ByJG\AccountStatements\Entity\StatementEntity;
-use ByJG\AccountStatements\Exception\AmountException;
-use ByJG\AccountStatements\Repository\AccountTypeRepository;
-use ByJG\AccountStatements\Repository\StatementRepository;
-use ByJG\Serializer\BinderObject;
-use ByJG\Serializer\SerializerObject;
-use DomainException;
-use InvalidArgumentException;
-use OutOfRangeException;
+use ByJG\Serializer\Serialize;
 use PHPUnit\Framework\TestCase;
-use UnderflowException;
-
-require_once(__DIR__ . '/../BaseDALTrait.php');
+use Tests\BaseDALTrait;
 
 
 class AccountStatementsTest extends TestCase
@@ -79,7 +70,7 @@ class AccountStatementsTest extends TestCase
                     'name' => 'Test 1'
                 ],
             ],
-            SerializerObject::instance($list)->serialize()
+            Serialize::from($list)->toArray()
         );
 
         $dto = $this->accountTypeBLL->getById('USDTEST');

@@ -2,6 +2,8 @@
 
 namespace ByJG\AccountStatements\Entity;
 
+use ByJG\MicroOrm\Attributes\FieldAttribute;
+use ByJG\MicroOrm\Attributes\TableAttribute;
 use ByJG\Serializer\BaseModel;
 
 /**
@@ -11,6 +13,7 @@ use ByJG\Serializer\BaseModel;
  *
  * @object:nodename accounttype
  */
+#[TableAttribute('accounttype')]
 class AccountTypeEntity extends BaseModel
 {
 
@@ -18,6 +21,7 @@ class AccountTypeEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
+    #[FieldAttribute(primaryKey: true)]
     protected $accounttypeid;
 
     /**

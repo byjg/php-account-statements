@@ -1,18 +1,37 @@
 <?php
 
-namespace Test;
+namespace Tests;
 
 use ByJG\AccountStatements\Bll\AccountBLL;
 use ByJG\AccountStatements\Bll\AccountTypeBLL;
 use ByJG\AccountStatements\Bll\StatementBLL;
+use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\AccountTypeEntity;
+use ByJG\AccountStatements\Entity\StatementEntity;
+use ByJG\AccountStatements\Exception\AccountException;
+use ByJG\AccountStatements\Exception\AccountTypeException;
+use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\AnyDataset\Db\DbDriverInterface;
+use ByJG\Config\Exception\ConfigNotFoundException;
+use ByJG\Config\Exception\EnvironmentException;
+use ByJG\Config\Exception\KeyNotFoundException;
 use ByJG\DbMigration\Database\MySqlDatabase;
+use ByJG\DbMigration\Exception\DatabaseDoesNotRegistered;
+use ByJG\DbMigration\Exception\DatabaseIsIncompleteException;
+use ByJG\DbMigration\Exception\DatabaseNotVersionedException;
+use ByJG\DbMigration\Exception\InvalidMigrationFile;
+use ByJG\DbMigration\Exception\OldVersionSchemaException;
 use ByJG\DbMigration\Migration;
+use ByJG\MicroOrm\Exception\InvalidArgumentException;
+use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
+use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\OrmModelInvalidException;
+use ByJG\MicroOrm\Exception\TransactionException;
 use ByJG\Util\Uri;
+use ReflectionException;
 
 trait BaseDALTrait
 {
@@ -20,23 +39,27 @@ trait BaseDALTrait
     /**
      * @var AccountBLL
      */
-    protected $accountBLL;
+    protected AccountBLL $accountBLL;
 
     /**
      * @var AccountTypeBLL
      */
-    protected $accountTypeBLL;
+    protected AccountTypeBLL $accountTypeBLL;
 
     /**
      * @var StatementBLL
      */
-    protected $statementBLL;
+    protected StatementBLL $statementBLL;
 
-    public function prepareObjects()
+    /**
+     * @throws ReflectionException
+     * @throws OrmModelInvalidException
+     */
+    public function prepareObjects($accountEntity = AccountEntity::class, $accountTypeEntity = AccountTypeEntity::class, $statementEntity = StatementEntity::class): void
     {
-        $accountRepository = new AccountRepository($this->dbDriver);
-        $accountTypeRepository = new AccountTypeRepository($this->dbDriver);
-        $statementRepository = new StatementRepository($this->dbDriver);
+        $accountRepository = new AccountRepository($this->dbDriver, $accountEntity);
+        $accountTypeRepository = new AccountTypeRepository($this->dbDriver, $accountTypeEntity);
+        $statementRepository = new StatementRepository($this->dbDriver, $statementEntity);
 
         $this->accountTypeBLL = new AccountTypeBLL($accountTypeRepository);
         $this->statementBLL = new StatementBLL($statementRepository, $accountRepository);
@@ -54,14 +77,14 @@ trait BaseDALTrait
     protected $dbDriver;
 
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\DbMigration\Exception\DatabaseDoesNotRegistered
-     * @throws \ByJG\DbMigration\Exception\DatabaseIsIncompleteException
-     * @throws \ByJG\DbMigration\Exception\DatabaseNotVersionedException
-     * @throws \ByJG\DbMigration\Exception\InvalidMigrationFile
-     * @throws \ByJG\DbMigration\Exception\OldVersionSchemaException
+     * @throws ConfigNotFoundException
+     * @throws EnvironmentException
+     * @throws KeyNotFoundException
+     * @throws DatabaseDoesNotRegistered
+     * @throws DatabaseIsIncompleteException
+     * @throws DatabaseNotVersionedException
+     * @throws InvalidMigrationFile
+     * @throws OldVersionSchemaException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     public function dbSetUp()
@@ -79,9 +102,9 @@ trait BaseDALTrait
     }
 
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
+     * @throws ConfigNotFoundException
+     * @throws EnvironmentException
+     * @throws KeyNotFoundException
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function dbClear()
@@ -102,14 +125,14 @@ trait BaseDALTrait
     }
 
     /**
-     * @throws \ByJG\Config\Exception\ConfigNotFoundException
-     * @throws \ByJG\Config\Exception\EnvironmentException
-     * @throws \ByJG\Config\Exception\KeyNotFoundException
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws \ByJG\MicroOrm\Exception\OrmBeforeInvalidException
-     * @throws \ByJG\MicroOrm\Exception\OrmInvalidFieldsException
+     * @throws AccountException
+     * @throws AccountTypeException
+     * @throws AmountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws TransactionException
      * @throws \ByJG\Serializer\Exception\InvalidArgumentException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
      */
     protected function createDummyData()
     {

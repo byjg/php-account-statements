@@ -105,7 +105,7 @@ class AccountBLL
      * @param float $balance
      * @param float|int $price
      * @param int $minValue
-     * @param string $extra
+     * @param string|null $extra
      * @return int
      * @throws AccountException
      * @throws AccountTypeException
@@ -116,7 +116,7 @@ class AccountBLL
      * @throws AmountException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function createAccount($accountTypeId, $userId, $balance, $price = 1, $minValue = 0, $extra = null)
+    public function createAccount(string $accountTypeId, string $userId, float $balance, float|int $price = 1, float|int $minValue = 0, string $extra = null)
     {
         // Faz as validações
         if ($this->accountTypeBLL->getById($accountTypeId) == null) {
@@ -140,16 +140,16 @@ class AccountBLL
             $result = $this->accountRepository->save($model);
             $accountId = $result->getAccountId();
         } catch (PDOException $ex) {
-            if (strpos($ex->getMessage(), "Duplicate entry") !== false) {
+            if (str_contains($ex->getMessage(), "Duplicate entry")) {
                 throw new AccountException("Usuário $userId já possui uma conta do tipo $accountTypeId");
             } else {
                 throw $ex;
             }
         }
 
-        if ($balance >= 0) {
+        if ($balance > 0) {
             $this->statementBLL->addFunds(StatementDTO::create($accountId, $balance)->setDescription("Opening Balance")->setCode('BAL'));
-        } else {
+        } elseif ($balance < 0) {
             $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 

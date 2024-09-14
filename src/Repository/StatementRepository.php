@@ -18,20 +18,14 @@ class StatementRepository extends BaseRepository
      * @param DbDriverInterface $dbDriver
      * @param FieldMapping[] $fieldMappingList
      */
-    public function __construct(DbDriverInterface $dbDriver, array $fieldMappingList = [])
+    public function __construct(DbDriverInterface $dbDriver, string $statementEntity, array $fieldMappingList = [])
     {
-        $mapper = new Mapper(
-            StatementEntity::class,
-            'statement',
-            'statementid'
-        );
+        $this->repository = new Repository($dbDriver, $statementEntity);
 
-        $mapper->addFieldMapping(FieldMapping::create("date")->withUpdateFunction(Mapper::doNotUpdateClosure()));
+        $mapper = $this->repository->getMapper();
         foreach ($fieldMappingList as $fieldMapping) {
             $mapper->addFieldMapping($fieldMapping);
         }
-
-        $this->repository = new Repository($dbDriver, $mapper);
     }
 
     /**

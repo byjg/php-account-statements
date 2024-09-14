@@ -6,26 +6,26 @@ namespace ByJG\AccountStatements\DTO;
 
 class StatementDTO
 {
-    protected $accountId = null;
-    protected $amount = null;
+    protected ?int $accountId = null;
+    protected ?float $amount = null;
 
-    protected $description = null;
-    protected $referenceId = null;
-    protected $referenceSource = null;
-    protected $code = null;
+    protected ?string $description = null;
+    protected ?string $referenceId = null;
+    protected ?string $referenceSource = null;
+    protected ?string $code = null;
 
     /**
      * StatementDTO constructor.
-     * @param $accountId
-     * @param $amount
+     * @param int|null $accountId
+     * @param float|null $amount
      */
-    public function __construct($accountId, $amount)
+    public function __construct(?int $accountId, ?float $amount)
     {
         $this->accountId = $accountId;
         $this->amount = $amount;
     }
 
-    public static function create($accountId, $amount)
+    public static function create(int $accountId, float $amount)
     {
         return new StatementDTO($accountId, $amount);
     }

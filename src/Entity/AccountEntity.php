@@ -3,6 +3,9 @@
 namespace ByJG\AccountStatements\Entity;
 
 use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\MicroOrm\Attributes\FieldAttribute;
+use ByJG\MicroOrm\Attributes\FieldReadOnlyAttribute;
+use ByJG\MicroOrm\Attributes\TableAttribute;
 use ByJG\Serializer\BaseModel;
 
 /**
@@ -12,12 +15,14 @@ use ByJG\Serializer\BaseModel;
  *
  * @object:NodeName account
  */
+#[TableAttribute('account')]
 class AccountEntity extends BaseModel
 {
     /**
      * @var int
      * @OA\Property()
      */
+    #[FieldAttribute(primaryKey: true)]
     protected $accountid;
 
     /**
@@ -66,6 +71,7 @@ class AccountEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
+    #[FieldAttribute(syncWithDb: false)]
     protected $entrydate;
 
     /**

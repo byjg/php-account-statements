@@ -14,14 +14,8 @@ class AccountTypeRepository extends BaseRepository
      *
      * @param DbDriverInterface $dbDriver
      */
-    public function __construct(DbDriverInterface $dbDriver)
+    public function __construct(DbDriverInterface $dbDriver, string $accountTypeEntity)
     {
-        $mapper = new Mapper(
-            AccountTypeEntity::class,
-            'accounttype',
-            'accounttypeid'
-        );
-
-        $this->repository = new Repository($dbDriver, $mapper);
+        $this->repository = new Repository($dbDriver, $accountTypeEntity);
     }
 }

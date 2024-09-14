@@ -2,8 +2,12 @@
 
 namespace ByJG\AccountStatements\Repository;
 
+use ByJG\AnyDataset\Core\IteratorFilter;
+use ByJG\AnyDataset\Db\DbDriverInterface;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
+use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\Repository;
 use ByJG\Serializer\Exception\InvalidArgumentException;
@@ -13,29 +17,27 @@ abstract class BaseRepository
     /**
      * @var Repository
      */
-    protected $repository;
+    protected Repository $repository;
 
     /**
-     * @param $itemId
+     * @param int $itemId
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getById($itemId)
+    public function getById(string $itemId): mixed
     {
         return $this->repository->get($itemId);
     }
 
     /**
      * @param int|null $page
-     * @param int $size
-     * @param null $orderBy
-     * @param null $filter
+     * @param int|null $size
+     * @param string|null $orderBy
+     * @param array|IteratorFilter|null $filter
      * @return array
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getAll($page = 0, $size = 20, $orderBy = null, $filter = null)
+    public function getAll(?int $page = 0, ?int $size = 20, ?string $orderBy = null, array|IteratorFilter|null $filter = null): array
     {
         if (empty($page)) {
             $page = 0;
@@ -50,14 +52,15 @@ abstract class BaseRepository
             ->limit($page*$size, $size);
 
         if (!empty($orderBy)) {
-            if (!is_array($orderBy)) {
-                $orderBy = [$orderBy];
-            }
-            $query->orderBy($orderBy);
+            $query->orderBy((array)$orderBy);
         }
 
-        foreach ((array)$filter as $item) {
-            $query->where($item[0], $item[1]);
+        if ($filter instanceof IteratorFilter) {
+            $query->where($filter);
+        } elseif (is_array($filter)) {
+            foreach ($filter as $item) {
+                $query->where($item[0], $item[1]);
+            }
         }
 
         return $this->repository
@@ -74,17 +77,19 @@ abstract class BaseRepository
     /**
      * @param $model
      * @return mixed
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
      * @throws OrmInvalidFieldsException
-     * @throws InvalidArgumentException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws RepositoryReadOnlyException
+     * @throws UpdateConstraintException
      */
-    public function save($model)
+    public function save($model): mixed
     {
         return $this->repository->save($model);
     }
 
-    public function getDbDriver()
+    public function getDbDriver(): DbDriverInterface
     {
         return $this->repository->getDbDriver();
     }

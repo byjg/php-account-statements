@@ -3,6 +3,8 @@
 namespace ByJG\AccountStatements\Entity;
 
 use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\MicroOrm\Attributes\FieldAttribute;
+use ByJG\MicroOrm\Attributes\TableAttribute;
 use ByJG\Serializer\BaseModel;
 
 /**
@@ -12,6 +14,7 @@ use ByJG\Serializer\BaseModel;
  *
  * @object:NodeName statement
  */
+#[TableAttribute('statement')]
 class StatementEntity extends BaseModel
 {
 
@@ -26,6 +29,7 @@ class StatementEntity extends BaseModel
      * @var int
      * @OA\Property()
      */
+    #[FieldAttribute(primaryKey: true)]
     protected $statementid;
 
     /**
@@ -56,6 +60,7 @@ class StatementEntity extends BaseModel
      * @var string
      * @OA\Property()
      */
+    #[FieldAttribute(syncWithDb: false)]
     protected $date;
 
     /**

@@ -1,23 +1,14 @@
 <?php
 
-namespace Test;
+namespace Tests\Database;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
-use Test\BaseDALTrait;
-use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Exception\StatementException;
-use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\Serializer\BinderObject;
-use DomainException;
-use InvalidArgumentException;
-use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
-use UnderflowException;
-
-require_once(__DIR__ . '/../BaseDALTrait.php');
-
+use Tests\BaseDALTrait;
 
 class ReserveFundsDepositTest extends TestCase
 {
