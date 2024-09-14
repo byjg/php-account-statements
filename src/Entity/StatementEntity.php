@@ -26,293 +26,293 @@ class StatementEntity extends BaseModel
     const WITHDRAW_BLOCKED = "WB";
 
     /**
-     * @var int
+     * @var int|null
      * @OA\Property()
      */
     #[FieldAttribute(primaryKey: true)]
-    protected $statementid;
+    protected ?int $statementid = null;
 
     /**
-     * @var int
+     * @var int|null
      * @OA\Property()
      */
-    protected $accountid;
+    protected ?int $accountid = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $typeid;
+    protected ?string $typeid = null;
 
     /**
-     * @var float
+     * @var float|string|int|null
      * @OA\Property()
      */
-    protected $amount;
+    protected float|string|int|null $amount = null;
 
     /**
-     * @var float
+     * @var float|string|int|null
      * @OA\Property()
      */
-    protected $price;
+    protected float|string|int|null $price = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
     #[FieldAttribute(syncWithDb: false)]
-    protected $date;
+    protected ?string $date = null;
 
     /**
-     * @var float
+     * @var float|string|int|null
      * @OA\Property()
      */
-    protected $grossbalance;
+    protected float|string|int|null $grossbalance = null;
 
     /**
-     * @var float
+     * @var float|string|int|null
      * @OA\Property()
      */
-    protected $uncleared;
+    protected float|string|int|null $uncleared = null;
 
     /**
-     * @var float
+     * @var float|string|int|null
      * @OA\Property()
      */
-    protected $netbalance;
+    protected float|string|int|null $netbalance = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $code;
+    protected ?string $code = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $description;
+    protected ?string $description = null;
 
     /**
-     * @var string
+     * @var int|null
      * @OA\Property()
      */
-    protected $statementparentid;
+    protected ?int $statementparentid = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $referenceid;
+    protected ?string $referenceid = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $referencesource;
+    protected ?string $referencesource = null;
 
     /**
-     * @var string
+     * @var string|null
      * @OA\Property()
      */
-    protected $accounttypeid;
+    protected ?string $accounttypeid = null;
 
-    public function getStatementId()
+    public function getStatementId(): ?int
     {
         return $this->statementid;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getAccountId()
+    public function getAccountId(): ?int
     {
         return $this->accountid;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTypeId()
+    public function getTypeId(): ?string
     {
         return $this->typeid;
     }
 
     /**
-     * @return float
+     * @return float|string|int|null
      */
-    public function getAmount()
+    public function getAmount(): float|string|int|null
     {
         return $this->amount;
     }
 
     /**
-     * @return float
+     * @return float|string|int|null
      */
-    public function getPrice()
+    public function getPrice(): float|string|int|null
     {
         return $this->price;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDate()
+    public function getDate(): ?string
     {
         return $this->date;
     }
 
     /**
-     * @return float
+     * @return float|string|int|null
      */
-    public function getGrossBalance()
+    public function getGrossBalance(): float|string|int|null
     {
         return $this->grossbalance;
     }
 
     /**
-     * @return float
+     * @return float|string|int|null
      */
-    public function getUnCleared()
+    public function getUnCleared(): float|string|int|null
     {
         return $this->uncleared;
     }
 
     /**
-     * @return float
+     * @return float|string|int|null
      */
-    public function getNetBalance()
+    public function getNetBalance(): float|string|int|null
     {
         return $this->netbalance;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getStatementParentId()
+    public function getStatementParentId(): ?int
     {
         return $this->statementparentid;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getReferenceId()
+    public function getReferenceId(): ?string
     {
         return $this->referenceid;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getReferenceSource()
+    public function getReferenceSource(): ?string
     {
         return $this->referencesource;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAccountTypeId()
+    public function getAccountTypeId(): ?string
     {
         return $this->accounttypeid;
     }
 
-    public function setStatementId($statementid)
+    public function setStatementId(?int $statementid): void
     {
         $this->statementid = $statementid;
     }
 
-    public function setAccountId($accountid)
+    public function setAccountId(?int $accountid): void
     {
         $this->accountid = $accountid;
     }
 
-    public function setTypeId($typeid)
+    public function setTypeId(?string $typeid): void
     {
         $this->typeid = $typeid;
     }
 
-    public function setAmount($amount)
+    public function setAmount(float|string|int|null $amount): void
     {
         $this->amount = $amount;
     }
 
-    public function setPrice($price)
+    public function setPrice(float|string|int|null $price): void
     {
         $this->price = $price;
     }
 
-    public function setDate($date)
+    public function setDate(?string $date): void
     {
         $this->date = $date;
     }
 
-    public function setGrossBalance($grossbalance)
+    public function setGrossBalance(float|string|int|null $grossbalance): void
     {
         $this->grossbalance = $grossbalance;
     }
 
-    public function setUnCleared($uncleared)
+    public function setUnCleared(float|string|int|null $uncleared): void
     {
         $this->uncleared = $uncleared;
     }
 
-    public function setNetBalance($netbalance)
+    public function setNetBalance(float|string|int|null $netbalance): void
     {
         $this->netbalance = $netbalance;
     }
 
-    public function setCode($code)
+    public function setCode(?string $code): void
     {
         $this->code = $code;
     }
 
-    public function setDescription($description)
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
 
-    public function setStatementParentId($statementparentid)
+    public function setStatementParentId(?int $statementparentid): void
     {
         $this->statementparentid = $statementparentid;
     }
 
-    public function setAccountTypeId($accounttypeid)
+    public function setAccountTypeId(?string $accounttypeid): void
     {
         $this->accounttypeid = $accounttypeid;
     }
 
-    public function setReferenceId($referenceid)
+    public function setReferenceId(?string $referenceid): void
     {
         $this->referenceid = $referenceid;
     }
 
-    public function setReferenceSource($referencesource)
+    public function setReferenceSource(?string $referencesource): void
     {
         $this->referencesource = $referencesource;
     }
 
     /**
-     * @var AccountEntity
+     * @var AccountEntity|null
      */
-    protected $account;
+    protected ?AccountEntity $account = null;
 
     public function attachAccount(AccountEntity $account)
     {

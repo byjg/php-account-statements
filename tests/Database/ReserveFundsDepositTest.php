@@ -6,7 +6,6 @@ use ByJG\AccountStatements\DTO\StatementDTO;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AmountException;
 use ByJG\AccountStatements\Exception\StatementException;
-use ByJG\Serializer\BinderObject;
 use PHPUnit\Framework\TestCase;
 use Tests\BaseDALTrait;
 
@@ -61,7 +60,7 @@ class ReserveFundsDepositTest extends TestCase
         $statement->setReferenceId('Referencia Deposit');
         $statement->setReferenceSource('Source Deposit');
         $statement->setAccountTypeId('USDTEST');
-        $statement->setStatementParentId("");
+        $statement->setStatementParentId(null);
 
         $actual = $this->statementBLL->getById($statementId);
         $statement->setDate($actual->getDate());

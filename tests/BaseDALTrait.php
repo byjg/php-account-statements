@@ -15,15 +15,7 @@ use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\AnyDataset\Db\DbDriverInterface;
-use ByJG\Config\Exception\ConfigNotFoundException;
-use ByJG\Config\Exception\EnvironmentException;
-use ByJG\Config\Exception\KeyNotFoundException;
 use ByJG\DbMigration\Database\MySqlDatabase;
-use ByJG\DbMigration\Exception\DatabaseDoesNotRegistered;
-use ByJG\DbMigration\Exception\DatabaseIsIncompleteException;
-use ByJG\DbMigration\Exception\DatabaseNotVersionedException;
-use ByJG\DbMigration\Exception\InvalidMigrationFile;
-use ByJG\DbMigration\Exception\OldVersionSchemaException;
 use ByJG\DbMigration\Migration;
 use ByJG\MicroOrm\Exception\InvalidArgumentException;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
@@ -76,17 +68,6 @@ trait BaseDALTrait
      */
     protected $dbDriver;
 
-    /**
-     * @throws ConfigNotFoundException
-     * @throws EnvironmentException
-     * @throws KeyNotFoundException
-     * @throws DatabaseDoesNotRegistered
-     * @throws DatabaseIsIncompleteException
-     * @throws DatabaseNotVersionedException
-     * @throws InvalidMigrationFile
-     * @throws OldVersionSchemaException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
     public function dbSetUp()
     {
         $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:mysqlp455w0rd@127.0.0.1/accounttest";
@@ -101,13 +82,7 @@ trait BaseDALTrait
         $this->dbDriver = $migration->getDbDriver();
     }
 
-    /**
-     * @throws ConfigNotFoundException
-     * @throws EnvironmentException
-     * @throws KeyNotFoundException
-     * @throws \Psr\SimpleCache\InvalidArgumentException
-     */
-    protected function dbClear()
+    protected function dbClear(): void
     {
         $this->dbDriver->execute(
             'DELETE statement FROM `account` INNER JOIN statement ' .

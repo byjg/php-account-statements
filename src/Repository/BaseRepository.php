@@ -20,11 +20,11 @@ abstract class BaseRepository
     protected Repository $repository;
 
     /**
-     * @param int $itemId
+     * @param string|int $itemId
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function getById(string $itemId): mixed
+    public function getById(string|int $itemId): mixed
     {
         return $this->repository->get($itemId);
     }

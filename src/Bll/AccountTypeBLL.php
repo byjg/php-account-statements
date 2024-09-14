@@ -7,16 +7,18 @@ use ByJG\AccountStatements\Exception\AccountTypeException;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
+use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
 
 class AccountTypeBLL
 {
 
-    protected $accountTypeRepository;
+    protected AccountTypeRepository $accountTypeRepository;
 
     /**
      * AccountTypeBLL constructor.
-     * @param $accountTypeRepository
+     * @param AccountTypeRepository $accountTypeRepository
      */
     public function __construct(AccountTypeRepository $accountTypeRepository)
     {
@@ -28,7 +30,7 @@ class AccountTypeBLL
      * Obtém um AccountType por ID.
      * Se o ID não for passado, então devolve todos os AccountTypes.
      *
-     * @param int $accountTypeId Opcional. Se não for passado obtém todos
+     * @param string $accountTypeId Opcional. Se não for passado obtém todos
      * @return AccountTypeEntity|AccountTypeEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
@@ -41,14 +43,16 @@ class AccountTypeBLL
      * Salvar ou Atualizar um AccountType
      *
      * @param mixed $data
-     * @return int Id do objeto inserido atualizado
+     * @return string Id do objeto inserido atualizado
      * @throws AccountTypeException
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
      * @throws OrmInvalidFieldsException
-     * @throws InvalidArgumentException
+     * @throws RepositoryReadOnlyException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function update($data)
+    public function update(mixed $data): string
     {
         $object = new AccountTypeEntity($data);
         $accountTypeId = $object->getAccountTypeId();
@@ -63,10 +67,10 @@ class AccountTypeBLL
 
         $this->accountTypeRepository->save($object);
 
-        return $accountTypeId;
+        return $accountTypeId ?? "";
     }
 
-    public function getRepository()
+    public function getRepository(): AccountTypeRepository
     {
         return $this->accountTypeRepository;
     }

@@ -3,6 +3,7 @@
 namespace ByJG\AccountStatements\Bll;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
+use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AmountException;
@@ -10,8 +11,12 @@ use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
 use ByJG\AnyDataset\Db\IsolationLevelEnum;
-use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
+use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
+use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
+use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
+use ByJG\Serializer\Serialize;
 use Exception;
 
 class StatementBLL
@@ -19,12 +24,12 @@ class StatementBLL
     /**
      * @var StatementRepository
      */
-    protected $statementRepository;
+    protected StatementRepository $statementRepository;
 
     /**
      * @var AccountRepository
      */
-    protected $accountRepository;
+    protected AccountRepository $accountRepository;
 
     /**
      * StatementBLL constructor.
@@ -37,16 +42,14 @@ class StatementBLL
         $this->accountRepository = $accountRepository;
     }
 
-
     /**
      * Get a Statement By ID.
      *
-     * @param int|string $statementId Optional. empty, return all all ids.
+     * @param int|string $statementId Optional. empty, return all ids.
      * @return mixed
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getById($statementId)
+    public function getById(int|string $statementId): mixed
     {
         return $this->statementRepository->getById($statementId);
     }
@@ -55,11 +58,18 @@ class StatementBLL
      * Add funds to an account
      *
      * @param StatementDTO $dto
-     * @return int Statement ID
+     * @return int|null Statement ID
+     * @throws AccountException
      * @throws AmountException
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function addFunds(StatementDTO $dto)
+    public function addFunds(StatementDTO $dto): ?int
     {
         // Validations
         if (!$dto->hasAccount()) {
@@ -77,23 +87,7 @@ class StatementBLL
                 throw new AccountException("addFunds: Account " . $dto->getAccountId() . " not found");
             }
 
-            // Update Values in an account
-            $account->setGrossBalance($account->getGrossBalance() + $dto->getAmount());
-            $account->setNetBalance($account->getNetBalance() + $dto->getAmount());
-            $this->accountRepository->save($account);
-
-            // Add the new line
-            $statement = new StatementEntity();
-            $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::DEPOSIT);
-            $statement->setDescription($dto->getDescription());
-            $statement->setReferenceId($dto->getReferenceId());
-            $statement->setReferenceSource($dto->getReferenceSource());
-            $statement->setCode($dto->getCode());
-            $statement->attachAccount($account);
-
-            // Save to DB
-            $result = $this->statementRepository->save($statement);
+            $result = $this->updateFunds(StatementEntity::DEPOSIT, $account, $dto);
 
             $this->getRepository()->getDbDriver()->commitTransaction();
 
@@ -106,14 +100,63 @@ class StatementBLL
     }
 
     /**
+     * @throws RepositoryReadOnlyException
+     * @throws InvalidArgumentException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     * @throws OrmInvalidFieldsException
+     * @throws UpdateConstraintException
+     * @throws OrmBeforeInvalidException
+     */
+    protected function updateFunds(string $operation, AccountEntity $account, StatementDTO $dto): StatementEntity
+    {
+        $sumGrossBalance = $dto->getAmount() * match($operation) {
+            StatementEntity::DEPOSIT => 1,
+            StatementEntity::WITHDRAW => -1,
+            default => 0,
+        };
+        $sumUnCleared = $dto->getAmount() * match($operation) {
+            StatementEntity::DEPOSIT_BLOCKED => -1,
+            StatementEntity::WITHDRAW_BLOCKED => 1,
+            default => 0,
+        };
+        $sumNetBalance = $dto->getAmount() * match($operation) {
+            StatementEntity::DEPOSIT, StatementEntity::DEPOSIT_BLOCKED => 1,
+            StatementEntity::WITHDRAW, StatementEntity::WITHDRAW_BLOCKED => -1,
+            default => 0,
+        };
+
+        // Update Values in an account
+        $account->setGrossBalance($account->getGrossBalance() + $sumGrossBalance);
+        $account->setUncleared($account->getUncleared() + $sumUnCleared);
+        $account->setNetBalance($account->getNetBalance() + $sumNetBalance);
+        $this->accountRepository->save($account);
+
+        // Add the new line
+        $statement = $this->statementRepository->getRepository()->entity(Serialize::from($dto)->toArray());
+        $statement->setTypeId($operation);
+        $statement->attachAccount($account);
+
+        // Save to DB
+        return $this->statementRepository->save($statement);
+    }
+
+    /**
      * Withdraw funds from an account
      *
      * @param StatementDTO $dto
-     * @return int Statement ID
+     * @param bool $allowZeroNoBalance
+     * @return int|null Statement ID
+     * @throws AccountException
      * @throws AmountException
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function withdrawFunds(StatementDTO $dto, $allowZeroNoBalance = false)
+    public function withdrawFunds(StatementDTO $dto, bool $allowZeroNoBalance = false): ?int
     {
         // Validations
         if (!$dto->hasAccount()) {
@@ -139,23 +182,7 @@ class StatementBLL
                 $dto->setAmount($account->getNetBalance() - $account->getMinValue());
             }
 
-            // Update balances
-            $account->setGrossBalance($account->getGrossBalance() - $dto->getAmount());
-            $account->setNetBalance($account->getNetBalance() - $dto->getAmount());
-            $this->accountRepository->save($account);
-
-            // Create the Statement
-            $statement = new StatementEntity();
-            $statement->setAccountId($dto->getAccountId());
-            $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::WITHDRAW);
-            $statement->setDescription($dto->getDescription());
-            $statement->setReferenceId($dto->getReferenceId());
-            $statement->setReferenceSource($dto->getReferenceSource());
-            $statement->setCode($dto->getCode());
-            $statement->attachAccount($account);
-
-            $result = $this->statementRepository->save($statement);
+            $result = $this->updateFunds(StatementEntity::WITHDRAW, $account, $dto);
 
             $this->getRepository()->getDbDriver()->commitTransaction();
 
@@ -171,11 +198,18 @@ class StatementBLL
      * Reserve funds to future withdrawn. It affects the net balance but not the gross balance
      *
      * @param StatementDTO $dto
-     * @return int Statement ID
+     * @return int|null Statement ID
+     * @throws AccountException
      * @throws AmountException
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function reserveFundsForWithdraw(StatementDTO $dto)
+    public function reserveFundsForWithdraw(StatementDTO $dto): ?int
     {
         // Validations
         if (!$dto->hasAccount()) {
@@ -197,23 +231,7 @@ class StatementBLL
                 throw new AmountException('Cannot withdraw above the account balance.');
             }
 
-            // Update Balance
-            $account->setUnCleared($account->getUnCleared() + $dto->getAmount());
-            $account->setNetBalance($account->getNetBalance() - $dto->getAmount());
-            $this->accountRepository->save($account);
-
-            // Create Statement
-            $statement = new StatementEntity();
-            $statement->setAccountId($dto->getAccountId());
-            $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::WITHDRAW_BLOCKED);
-            $statement->setDescription($dto->getDescription());
-            $statement->setReferenceId($dto->getReferenceId());
-            $statement->setReferenceSource($dto->getReferenceSource());
-            $statement->setCode($dto->getCode());
-            $statement->attachAccount($account);
-
-            $result = $this->statementRepository->save($statement);
+            $result = $this->updateFunds(StatementEntity::WITHDRAW_BLOCKED, $account, $dto);
 
             $this->getRepository()->getDbDriver()->commitTransaction();
 
@@ -229,11 +247,18 @@ class StatementBLL
      * Reserve funds to future deposit. Update net balance but not gross balance.
      *
      * @param StatementDTO $dto
-     * @return int Statement ID
+     * @return int|null Statement ID
+     * @throws AccountException
      * @throws AmountException
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function reserveFundsForDeposit(StatementDTO $dto)
+    public function reserveFundsForDeposit(StatementDTO $dto): ?int
     {
         // Validações
         if (!$dto->hasAccount()) {
@@ -250,23 +275,7 @@ class StatementBLL
                 throw new AccountException('reserveFundsForDeposit: Account not found');
             }
 
-            // Update Balances
-            $account->setUnCleared($account->getUnCleared() - $dto->getAmount());
-            $account->setNetBalance($account->getNetBalance() + $dto->getAmount());
-            $this->accountRepository->save($account);
-
-            // Create Statement
-            $statement = new StatementEntity();
-            $statement->setAccountId($dto->getAccountId());
-            $statement->setAmount($dto->getAmount());
-            $statement->setTypeId(StatementEntity::DEPOSIT_BLOCKED);
-            $statement->setDescription($dto->getDescription());
-            $statement->setReferenceId($dto->getReferenceId());
-            $statement->setReferenceSource($dto->getReferenceSource());
-            $statement->setCode($dto->getCode());
-            $statement->attachAccount($account);
-
-            $result = $this->statementRepository->save($statement);
+            $result = $this->updateFunds(StatementEntity::DEPOSIT_BLOCKED, $account, $dto);
 
             $this->getRepository()->getDbDriver()->commitTransaction();
 
@@ -282,11 +291,17 @@ class StatementBLL
      * Accept a reserved fund and update gross balance
      *
      * @param int $statementId
-     * @param StatementDTO $statementDto
+     * @param null $statementDto
      * @return int Statement ID
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptFundsById($statementId, $statementDto = null)
+    public function acceptFundsById(int $statementId, $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();
@@ -345,11 +360,17 @@ class StatementBLL
      * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
-     * @param StatementDTO $statementDto
+     * @param null $statementDto
      * @return int Statement ID
-     * @throws TransactionException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function rejectFundsById($statementId, $statementDto = null)
+    public function rejectFundsById(int $statementId, $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();
@@ -407,17 +428,23 @@ class StatementBLL
     /**
      * Update all blocked (reserved) transactions
      *
-     * @param int $accountId
+     * @param int|null $accountId
      * @return StatementEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getUnclearedStatements($accountId = null)
+    public function getUnclearedStatements(int $accountId = null): array
     {
         return $this->statementRepository->getUnclearedStatements($accountId);
     }
 
-    public function getByDate($accountId, $startDate, $endDate)
+    /**
+     * @param int $accountId
+     * @param string $startDate
+     * @param string $endDate
+     * @return array
+     */
+    public function getByDate(int $accountId, string $startDate, string $endDate): array
     {
         return $this->statementRepository->getByDate($accountId, $startDate, $endDate);
     }
@@ -425,12 +452,10 @@ class StatementBLL
     /**
      * This statement is blocked (reserved)
      *
-     * @param int $statementId
+     * @param int|null $statementId
      * @return bool
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function isStatementUncleared($statementId = null)
+    public function isStatementUncleared(int $statementId = null): bool
     {
         return null === $this->statementRepository->getByParentId($statementId, true);
     }
@@ -438,7 +463,7 @@ class StatementBLL
     /**
      * @return StatementRepository
      */
-    public function getRepository()
+    public function getRepository(): StatementRepository
     {
         return $this->statementRepository;
     }

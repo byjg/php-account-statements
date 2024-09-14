@@ -3,7 +3,6 @@
 namespace Tests\Database;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
-use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AccountTypeException;
@@ -213,7 +212,7 @@ class AccountStatementsTest extends TestCase
         $statement[2]->setDescription('Test');
         $statement[2]->setGrossBalance('940.00000');
         $statement[2]->setAccountId($accountId);
-        $statement[2]->setStatementId('4');
+        $statement[2]->setStatementId(4);
         $statement[2]->setTypeId('W');
         $statement[2]->setNetBalance('940.00000');
         $statement[2]->setPrice('1.00000');
@@ -224,6 +223,7 @@ class AccountStatementsTest extends TestCase
 
         $listAll = $this->statementBLL->getRepository()->getAll(null, null, null, [["accounttypeid = :id",["id" => 'USDTEST']]]);
 
+        /** @psalm-suppress InvalidArrayOffset */
         for ($i=0; $i<count($statement); $i++) {
             $statement[$i]->setDate(null);
             $statement[$i]->setStatementId(null);
@@ -406,7 +406,7 @@ class AccountStatementsTest extends TestCase
         $account = $this->accountBLL->getByUserId("___TESTUSER-10");
         $account[0]->setEntryDate(null);
 
-        $accountEntity = new AccountEntity([
+        $accountEntity = $this->accountBLL->getRepository()->getMapper()->getEntity([
             "accountid" => $accountId,
             "accounttypeid" => "USDTEST",
             "userid" => "___TESTUSER-10",
@@ -448,7 +448,7 @@ class AccountStatementsTest extends TestCase
         $account = $this->accountBLL->getByAccountTypeId('ABCTEST');
         $account[0]->setEntryDate(null);
 
-        $accountEntity = new AccountEntity([
+        $accountEntity = $this->accountBLL->getRepository()->getMapper()->getEntity([
             "accountid" => $accountId,
             "accounttypeid" => "ABCTEST",
             "userid" => "___TESTUSER-10",
@@ -626,7 +626,7 @@ class AccountStatementsTest extends TestCase
         $this->statementBLL->addFunds(StatementDTO::create($ignore, 200));
 
         $startDate = date('Y'). "/" . date('m') . "/01";
-        $endDate = (date('Y') + (date('m') == 12 ? 1 : 0)) . "/" . (date('m') == 12 ? 1 : date('m') + 1) . "/01";
+        $endDate = (intval(date('Y')) + (date('m') == 12 ? 1 : 0)) . "/" . (date('m') == 12 ? 1 : intval(date('m')) + 1) . "/01";
 
         $statementList = $this->statementBLL->getByDate($accountId, $startDate, $endDate);
 
