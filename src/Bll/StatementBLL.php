@@ -132,7 +132,14 @@ class StatementBLL
         $this->accountRepository->save($account);
 
         // Add the new line
-        $statement = $this->statementRepository->getRepository()->entity(Serialize::from($dto)->toArray());
+        /** @var StatementEntity $statement */
+        $statement = $this->statementRepository->getRepository()->entity([]);
+        $statement->setAccountId($dto->getAccountId());
+        $statement->setAmount($dto->getAmount());
+        $statement->setCode($dto->getCode());
+        $statement->setDescription($dto->getDescription());
+        $statement->setReferenceSource($dto->getReferenceSource());
+        $statement->setReferenceId($dto->getReferenceId());
         $statement->setTypeId($operation);
         $statement->attachAccount($account);
 
