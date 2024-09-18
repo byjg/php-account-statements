@@ -148,9 +148,9 @@ class AccountBLL
             }
         }
 
-        if ($balance > 0) {
+        if ($balance >= 0) {
             $this->statementBLL->addFunds(StatementDTO::create($accountId, $balance)->setDescription("Opening Balance")->setCode('BAL'));
-        } elseif ($balance < 0) {
+        } else {
             $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, abs($balance))->setDescription("Opening Balance")->setCode('BAL'));
         }
 
