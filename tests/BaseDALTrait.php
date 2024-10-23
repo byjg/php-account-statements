@@ -70,7 +70,7 @@ trait BaseDALTrait
 
     public function dbSetUp()
     {
-        $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:mysqlp455w0rd@127.0.0.1/accounttest";
+        $uriMySqlTest = getenv('MYSQL_TEST_URI') ? getenv('MYSQL_TEST_URI') : "mysql://root:password@127.0.0.1/accounttest";
         $this->uri = new Uri($uriMySqlTest);
 
         Migration::registerDatabase(MySqlDatabase::class);
