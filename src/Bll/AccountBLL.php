@@ -17,9 +17,9 @@ use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
-use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
+use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
-use Exception;
 use PDOException;
 
 class AccountBLL
@@ -27,17 +27,17 @@ class AccountBLL
     /**
      * @var AccountRepository
      */
-    protected $accountRepository;
+    protected AccountRepository $accountRepository;
 
     /**
      * @var AccountTypeBLL
      */
-    protected $accountTypeBLL;
+    protected AccountTypeBLL $accountTypeBLL;
 
     /**
      * @var StatementBLL
      */
-    protected $statementBLL;
+    protected StatementBLL $statementBLL;
 
     /**
      * AccountBLL constructor.
@@ -60,9 +60,8 @@ class AccountBLL
      * @param int $accountId Optional id empty return all. 
      * @return AccountEntity|AccountEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getById($accountId)
+    public function getById(int $accountId): array|AccountEntity
     {
         
         return $this->accountRepository->getById($accountId);
@@ -77,7 +76,7 @@ class AccountBLL
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
      */
-    public function getByUserId($userId, $accountType = "")
+    public function getByUserId(string $userId, string $accountType = ""): array
     {
         
 
@@ -87,12 +86,12 @@ class AccountBLL
     /**
      * Obtém uma lista  AccountEntity pelo Account Type ID
      *
-     * @param int $accountTypeId
+     * @param string $accountTypeId
      * @return AccountEntity[]
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function getByAccountTypeId($accountTypeId)
+    public function getByAccountTypeId(string $accountTypeId): array
     {
         return $this->accountRepository->getByAccountTypeId($accountTypeId);
     }
@@ -104,19 +103,21 @@ class AccountBLL
      * @param string $userId
      * @param float $balance
      * @param float|int $price
-     * @param int $minValue
-     * @param string $extra
+     * @param float|int $minValue
+     * @param string|null $extra
      * @return int
      * @throws AccountException
      * @throws AccountTypeException
+     * @throws AmountException
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
      * @throws OrmInvalidFieldsException
-     * @throws TransactionException
-     * @throws AmountException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function createAccount($accountTypeId, $userId, $balance, $price = 1, $minValue = 0, $extra = null)
+    public function createAccount(string $accountTypeId, string $userId, float $balance, float|int $price = 1, float|int $minValue = 0, string $extra = null): int
     {
         // Faz as validações
         if ($this->accountTypeBLL->getById($accountTypeId) == null) {
@@ -140,7 +141,7 @@ class AccountBLL
             $result = $this->accountRepository->save($model);
             $accountId = $result->getAccountId();
         } catch (PDOException $ex) {
-            if (strpos($ex->getMessage(), "Duplicate entry") !== false) {
+            if (str_contains($ex->getMessage(), "Duplicate entry")) {
                 throw new AccountException("Usuário $userId já possui uma conta do tipo $accountTypeId");
             } else {
                 throw $ex;
@@ -164,16 +165,24 @@ class AccountBLL
      * @param float|int $newPrice
      * @param float|int $newMinValue
      * @param string $description
-     * @throws Exception
-     * @return int
+     * @return int|null
+     * @throws AccountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
     public function overrideBalance(
-        $accountId,
-        $newBalance,
-        $newPrice = 1,
-        $newMinValue = 0,
-        $description = "Reset Balance"
-    ) {
+        int       $accountId,
+        float     $newBalance,
+        float|int $newPrice = 1,
+        float|int $newMinValue = 0,
+        string $description = "Reset Balance"
+    ): ?int
+    {
         
         $model = $this->accountRepository->getById($accountId);
 
@@ -226,25 +235,37 @@ class AccountBLL
      * Encerra (Zera) uma conta
      *
      * @param int $accountId
-     * @return int
-     * @throws Exception
+     * @return int|null
+     * @throws AccountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function closeAccount($accountId)
+    public function closeAccount(int $accountId): ?int
     {
-        return $this->overrideBalance($accountId, 0, 0, 0);
+        return $this->overrideBalance($accountId, 0, 0);
     }
 
     /**
-     * @param $accountId
-     * @param $balance
+     * @param int $accountId
+     * @param float $balance
      * @param string $description
-     * @return int
-     * @throws InvalidArgumentException
-     * @throws TransactionException
+     * @return int|null
+     * @throws AccountException
      * @throws AmountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function partialBalance($accountId, $balance, $description = "Partial Balance")
+    public function partialBalance(int $accountId, float $balance, string $description = "Partial Balance"): ?int
     {
         $account = $this->getById($accountId);
 
@@ -259,7 +280,22 @@ class AccountBLL
         return $statementId;
     }
 
-    public function transferFunds($accountSource, $accountTarget, $amount)
+    /**
+     * @param int $accountSource
+     * @param int $accountTarget
+     * @param float $amount
+     * @return array
+     * @throws AccountException
+     * @throws AmountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     */
+    public function transferFunds(int $accountSource, int $accountTarget, float $amount): array
     {
         $refSource = bin2hex(openssl_random_pseudo_bytes(16));
 
@@ -285,7 +321,7 @@ class AccountBLL
         return [ $statementSourceId, $statementTargetId ];
     }
 
-    public function getRepository()
+    public function getRepository(): AccountRepository
     {
         return $this->accountRepository;
     }

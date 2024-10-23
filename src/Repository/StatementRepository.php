@@ -4,11 +4,13 @@ namespace ByJG\AccountStatements\Repository;
 
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AnyDataset\Db\DbDriverInterface;
+use ByJG\MicroOrm\Exception\OrmModelInvalidException;
 use ByJG\MicroOrm\FieldMapping;
 use ByJG\MicroOrm\Mapper;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\Repository;
 use ByJG\Serializer\Exception\InvalidArgumentException;
+use ReflectionException;
 
 class StatementRepository extends BaseRepository
 {
@@ -16,22 +18,29 @@ class StatementRepository extends BaseRepository
      * StatementRepository constructor.
      *
      * @param DbDriverInterface $dbDriver
+     * @param string $statementEntity
      * @param FieldMapping[] $fieldMappingList
+     * @throws OrmModelInvalidException
+     * @throws ReflectionException
      */
-    public function __construct(DbDriverInterface $dbDriver, array $fieldMappingList = [])
+    public function __construct(DbDriverInterface $dbDriver, string $statementEntity, array $fieldMappingList = [])
     {
-        $mapper = new Mapper(
-            StatementEntity::class,
-            'statement',
-            'statementid'
-        );
+        $this->repository = new Repository($dbDriver, $statementEntity);
 
-        $mapper->addFieldMapping(FieldMapping::create("date")->withUpdateFunction(Mapper::doNotUpdateClosure()));
+        $mapper = $this->repository->getMapper();
         foreach ($fieldMappingList as $fieldMapping) {
             $mapper->addFieldMapping($fieldMapping);
         }
+    }
 
-        $this->repository = new Repository($dbDriver, $mapper);
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    public function getMapper(): Mapper
+    {
+        return $this->repository->getMapper();
     }
 
     /**
@@ -39,11 +48,9 @@ class StatementRepository extends BaseRepository
      *
      * @param int $parentId
      * @param bool $forUpdate
-     * @return StatementEntity
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
+     * @return StatementEntity|null
      */
-    public function getByParentId($parentId, $forUpdate = false)
+    public function getByParentId(int $parentId, bool $forUpdate = false): ?StatementEntity
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -68,9 +75,8 @@ class StatementRepository extends BaseRepository
      * @param int $limit
      * @return StatementEntity[]
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getByAccountId($accountId, $limit = 20)
+    public function getByAccountId(int $accountId, int $limit = 20): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -82,12 +88,12 @@ class StatementRepository extends BaseRepository
     }
 
     /**
-     * @param null $accountId
+     * @param int|null $accountId
      * @return array
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function getUnclearedStatements($accountId = null)
+    public function getUnclearedStatements(?int $accountId = null): array
     {
         $query = Query::getInstance()
             ->fields([
@@ -110,12 +116,12 @@ class StatementRepository extends BaseRepository
     }
 
     /**
-     * @param null $accountId
+     * @param int $accountId
+     * @param string $startDate
+     * @param string $endDate
      * @return array
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getByDate($accountId, $startDate, $endDate)
+    public function getByDate(int $accountId, string $startDate, string $endDate): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -127,7 +133,7 @@ class StatementRepository extends BaseRepository
         return $this->repository->getByQuery($query);
     }
 
-    public function getByCode($accountId, $code, $startDate = null, $endDate = null)
+    public function getByCode(int $accountId, string $code, string $startDate = null, string $endDate = null): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -147,7 +153,7 @@ class StatementRepository extends BaseRepository
         return $this->repository->getByQuery($query);
     }
 
-    public function getByReferenceId($accountId, $referenceSource, $referenceId, $startDate = null, $endDate = null)
+    public function getByReferenceId(int $accountId, string $referenceSource, string $referenceId, ?string $startDate = null, ?string $endDate = null): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())

@@ -4,11 +4,13 @@ namespace ByJG\AccountStatements\Repository;
 
 use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AnyDataset\Db\DbDriverInterface;
+use ByJG\MicroOrm\Exception\OrmModelInvalidException;
 use ByJG\MicroOrm\FieldMapping;
 use ByJG\MicroOrm\Mapper;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\Repository;
 use ByJG\Serializer\Exception\InvalidArgumentException;
+use ReflectionException;
 
 class AccountRepository extends BaseRepository
 {
@@ -16,32 +18,37 @@ class AccountRepository extends BaseRepository
      * AccountRepository constructor.
      *
      * @param DbDriverInterface $dbDriver
+     * @param string $accountEntity
      * @param FieldMapping[] $fieldMappingList
+     * @throws OrmModelInvalidException
+     * @throws ReflectionException
      */
-    public function __construct(DbDriverInterface $dbDriver, array $fieldMappingList = [])
+    public function __construct(DbDriverInterface $dbDriver, string $accountEntity, array $fieldMappingList = [])
     {
-        $mapper = new Mapper(
-            AccountEntity::class,
-            'account',
-            'accountid'
-        );
+        $this->repository = new Repository($dbDriver, $accountEntity);
 
-        $mapper->addFieldMapping(FieldMapping::create("entrydate")->withUpdateFunction(Mapper::doNotUpdateClosure()));
+        $mapper = $this->repository->getMapper();
         foreach ($fieldMappingList as $fieldMapping) {
             $mapper->addFieldMapping($fieldMapping);
         }
+    }
 
-        $this->repository = new Repository($dbDriver, $mapper);
+    public function getRepository(): Repository
+    {
+        return $this->repository;
+    }
+
+    public function getMapper(): Mapper
+    {
+        return $this->repository->getMapper();
     }
 
     /**
-     * @param $userId
+     * @param string $userId
      * @param string $accountType
-     * @return mixed
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
+     * @return array
      */
-    public function getByUserId($userId, $accountType = "")
+    public function getByUserId(string $userId, string $accountType = ""): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -57,12 +64,10 @@ class AccountRepository extends BaseRepository
     }
 
     /**
-     * @param $accountTypeId
+     * @param string $accountTypeId
      * @return array
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
-     * @throws InvalidArgumentException
      */
-    public function getByAccountTypeId($accountTypeId)
+    public function getByAccountTypeId(string $accountTypeId): array
     {
         $query = Query::getInstance()
             ->table($this->repository->getMapper()->getTable())
@@ -75,13 +80,12 @@ class AccountRepository extends BaseRepository
     }
 
     /**
-     * @param $userId
-     * @param string $statementId
+     * @param int $statementId
      * @return AccountEntity|null
-     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      * @throws InvalidArgumentException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function getByStatementId($statementId)
+    public function getByStatementId(int $statementId): ?AccountEntity
     {
         $query = Query::getInstance()
             ->fields(['account.*'])
