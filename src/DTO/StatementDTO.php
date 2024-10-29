@@ -4,43 +4,45 @@
 namespace ByJG\AccountStatements\DTO;
 
 
+use ByJG\AccountStatements\Entity\StatementEntity;
+
 class StatementDTO
 {
-    protected $accountId = null;
-    protected $amount = null;
+    protected ?int $accountId = null;
+    protected ?float $amount = null;
 
-    protected $description = null;
-    protected $referenceId = null;
-    protected $referenceSource = null;
-    protected $code = null;
+    protected ?string $description = null;
+    protected ?string $referenceId = null;
+    protected ?string $referenceSource = null;
+    protected ?string $code = null;
 
     /**
      * StatementDTO constructor.
-     * @param $accountId
-     * @param $amount
+     * @param int|null $accountId
+     * @param float|null $amount
      */
-    public function __construct($accountId, $amount)
+    public function __construct(?int $accountId, ?float $amount)
     {
         $this->accountId = $accountId;
         $this->amount = $amount;
     }
 
-    public static function create($accountId, $amount)
+    public static function create(int $accountId, float $amount): static
     {
         return new StatementDTO($accountId, $amount);
     }
 
-    public static function createEmpty()
+    public static function createEmpty(): static
     {
         return new StatementDTO(null, null);
     }
 
-    public function hasAccount()
+    public function hasAccount(): bool
     {
-        return !empty($this->accountId) && ($this->amount === 0 || !empty($this->amount));
+        return !empty($this->accountId) && (!is_null($this->amount));
     }
 
-    public function setToStatement($statement)
+    public function setToStatement(StatementEntity $statement): void
     {
         if (!empty($this->getDescription())) {
             $statement->setDescription($this->getDescription());
@@ -57,60 +59,60 @@ class StatementDTO
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getAccountId()
+    public function getAccountId(): ?int
     {
         return $this->accountId;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getAmount()
+    public function getAmount(): ?float
     {
         return $this->amount;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getReferenceId()
+    public function getReferenceId(): ?string
     {
         return $this->referenceId;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getReferenceSource()
+    public function getReferenceSource(): ?string
     {
         return $this->referenceSource;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
-    public function setAccountId($accountId)
+    public function setAccountId(int $accountId): static
     {
         $this->accountId = $accountId;
         return $this;
     }
 
-    public function setAmount($amount)
+    public function setAmount(float $amount): static
     {
         $this->amount = $amount;
         return $this;
@@ -118,9 +120,9 @@ class StatementDTO
 
     /**
      * @param string $description
-     * @return StatementDTO
+     * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description): static
     {
         $this->description = $description;
         return $this;
@@ -128,9 +130,9 @@ class StatementDTO
 
     /**
      * @param string $referenceId
-     * @return StatementDTO
+     * @return $this
      */
-    public function setReferenceId($referenceId)
+    public function setReferenceId(string $referenceId): static
     {
         $this->referenceId = $referenceId;
         return $this;
@@ -138,9 +140,9 @@ class StatementDTO
 
     /**
      * @param string $referenceSource
-     * @return StatementDTO
+     * @return $this
      */
-    public function setReferenceSource($referenceSource)
+    public function setReferenceSource(string $referenceSource): static
     {
         $this->referenceSource = $referenceSource;
         return $this;
@@ -148,9 +150,9 @@ class StatementDTO
 
     /**
      * @param string $code
-     * @return StatementDTO
+     * @return $this
      */
-    public function setCode($code)
+    public function setCode(string $code): static
     {
         $this->code = $code;
         return $this;

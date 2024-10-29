@@ -2,10 +2,8 @@
   <configuration default="false" name="MySQL" type="docker-deploy" factoryName="docker-image" server-name="Docker">
     <deployment type="docker-image">
       <settings>
-        <option name="imageTag" value="mysql:5.7" />
-        <option name="command" value="" />
+        <option name="imageTag" value="mysql:8.0" />
         <option name="containerName" value="mysql-account" />
-        <option name="entrypoint" value="" />
         <option name="envVars">
           <list>
             <DockerEnvVarImpl>
@@ -22,7 +20,6 @@
             </DockerPortBindingImpl>
           </list>
         </option>
-        <option name="commandLineOptions" value="" />
       </settings>
     </deployment>
     <method v="2" />
