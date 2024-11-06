@@ -102,7 +102,7 @@ class StatementBLL
             throw new AmountException('Amount needs to be greater than zero');
         }
 
-        if (intval($dto->getAmount()*100) != $dto->getAmount()*100) {
+        if (round($dto->getAmount()*100)/100 != $dto->getAmount()) {
             throw new AmountException('Amount needs to have two decimal places');
         }
     }

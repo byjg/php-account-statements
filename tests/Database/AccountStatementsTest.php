@@ -283,6 +283,7 @@ class AccountStatementsTest extends TestCase
             [250.19],
             [250.32],
             [250.41],
+            [2055.49],
             [10.23456789 - 1.21456789]
         ];
     }

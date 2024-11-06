@@ -86,7 +86,7 @@ class ReserveFundsDepositTest extends TestCase
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
-        $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, 10.03)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+        $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, 10.031)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
     public function testReserveForDepositFunds_Negative()
