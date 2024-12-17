@@ -653,7 +653,7 @@
 //                 "netbalance" => 1000,
 //                 "price" => 1,
 //                 "extra" => "Extra Information",
-//                 "minvalue" => "0.00000"
+//                 "minvalue" => "0.00"
 //             ]
 //         ], $result);
 //     }
@@ -704,7 +704,7 @@
 //                 "netbalance" => 1000,
 //                 "price" => 1,
 //                 "extra" => "Extra Information",
-//                 "minvalue" => "0.00000"
+//                 "minvalue" => "0.00"
 //             ]
 //         ], $result);
 //     }

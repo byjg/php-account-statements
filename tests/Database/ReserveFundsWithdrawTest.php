@@ -46,16 +46,16 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('1000.00000');
+        $statement->setGrossBalance('1000.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('WB');
-        $statement->setNetBalance('650.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('350.00000');
+        $statement->setNetBalance('650.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('350.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
@@ -70,11 +70,26 @@ class ReserveFundsWithdrawTest extends TestCase
     public function testReserveForWithdrawFunds_Invalid()
     {
         $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to be greater than zero');
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->reserveFundsForWithdraw(
             StatementDTO::create($accountId, -50)
+                ->setDescription('Test Withdraw')
+                ->setReferenceId('Referencia Withdraw')
+                ->setReferenceSource('Source Withdraw'));
+    }
+
+    public function testReserveForWithdrawFunds_InvalidRound()
+    {
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to have two decimal places');
+
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 45.009)
                 ->setDescription('Test Withdraw')
                 ->setReferenceId('Referencia Withdraw')
                 ->setReferenceSource('Source Withdraw'));
@@ -93,16 +108,16 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('1150.00000');
+        $statement->setAmount('1150.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('1000.00000');
+        $statement->setGrossBalance('1000.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('WB');
-        $statement->setNetBalance('-150.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('1150.00000');
+        $statement->setNetBalance('-150.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('1150.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
@@ -193,16 +208,16 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('500.00000');
+        $statement->setGrossBalance('500.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($actualId);
         $statement->setStatementParentId($statementId);
         $statement->setTypeId('W');
-        $statement->setNetBalance('500.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('500.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setDate($actual->getDate());
@@ -282,16 +297,16 @@ class ReserveFundsWithdrawTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('850.00000');
+        $statement->setGrossBalance('850.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($actualId);
         $statement->setStatementParentId($statementId);
         $statement->setTypeId('R');
-        $statement->setNetBalance('850.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('850.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setDate($actual->getDate());

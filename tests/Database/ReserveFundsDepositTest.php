@@ -47,16 +47,16 @@ class ReserveFundsDepositTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Deposit');
-        $statement->setGrossBalance('1000.00000');
+        $statement->setGrossBalance('1000.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('DB');
-        $statement->setNetBalance('1350.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('-350.00000');
+        $statement->setNetBalance('1350.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('-350.00');
         $statement->setReferenceId('Referencia Deposit');
         $statement->setReferenceSource('Source Deposit');
         $statement->setAccountTypeId('USDTEST');
@@ -72,10 +72,21 @@ class ReserveFundsDepositTest extends TestCase
     public function testReserveForDepositFunds_Invalid()
     {
         $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to be greater than zero');
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, -50)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
+    }
+
+    public function testReserveForDepositFunds_InvalidRound()
+    {
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to have two decimal places');
+
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $this->statementBLL->reserveFundsForDeposit(StatementDTO::create($accountId, 10.031)->setDescription('Test Withdraw')->setReferenceId('Referencia Withdraw'));
     }
 
     public function testReserveForDepositFunds_Negative()
@@ -91,16 +102,16 @@ class ReserveFundsDepositTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('300.00000');
+        $statement->setAmount('300.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Deposit');
-        $statement->setGrossBalance('-200.00000');
+        $statement->setGrossBalance('-200.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('DB');
-        $statement->setNetBalance('100.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('-300.00000');
+        $statement->setNetBalance('100.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('-300.00');
         $statement->setReferenceId('Referencia Deposit');
         $statement->setReferenceSource('Source Deposit');
         $statement->setAccountTypeId('USDTEST');
@@ -179,16 +190,16 @@ public function testAcceptFundsById_InvalidType()
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDescription('Test Deposit');
-        $statement->setGrossBalance('1500.00000');
+        $statement->setGrossBalance('1500.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($actualId);
         $statement->setStatementParentId($statementId);
         $statement->setTypeId('D');
-        $statement->setNetBalance('1500.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('1500.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Deposit');
         $statement->setReferenceSource('Source Deposit');
         $statement->setDate($actual->getDate());
@@ -248,16 +259,16 @@ public function testAcceptFundsById_InvalidType()
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDescription('Test Deposit');
-        $statement->setGrossBalance('1150.00000');
+        $statement->setGrossBalance('1150.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($actualId);
         $statement->setStatementParentId($statementId);
         $statement->setTypeId('R');
-        $statement->setNetBalance('1150.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('1150.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Deposit');
         $statement->setReferenceSource('Source Deposit');
         $statement->setDate($actual->getDate());

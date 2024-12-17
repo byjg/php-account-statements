@@ -91,16 +91,16 @@ class AccountStatementsTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('10.00000');
+        $statement->setAmount('10.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test');
-        $statement->setGrossBalance('990.00000');
+        $statement->setGrossBalance('990.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('W');
-        $statement->setNetBalance('990.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('990.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia');
         $statement->setReferenceSource('Source');
         $statement->setCode('XYZ');
@@ -127,16 +127,16 @@ class AccountStatementsTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('10.00000');
+        $statement->setAmount('10.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test');
-        $statement->setGrossBalance('10.00000');
+        $statement->setGrossBalance('10.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('D');
-        $statement->setNetBalance('10.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('10.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia');
         $statement->setReferenceSource('Source');
         $statement->setCode('XYZ');
@@ -176,47 +176,47 @@ class AccountStatementsTest extends TestCase
 
         // Objetos que são esperados
         $statement[] = new StatementEntity;
-        $statement[0]->setAmount('1000.00000');
+        $statement[0]->setAmount('1000.00');
         $statement[0]->setDate('2015-01-24');
         $statement[0]->setDescription('Opening Balance');
         $statement[0]->setCode('BAL');
-        $statement[0]->setGrossBalance('1000.00000');
+        $statement[0]->setGrossBalance('1000.00');
         $statement[0]->setAccountId($accountId);
         $statement[0]->setStatementId(2);
         $statement[0]->setTypeId('D');
-        $statement[0]->setNetBalance('1000.00000');
-        $statement[0]->setPrice('1.00000');
-        $statement[0]->setUnCleared('0.00000');
+        $statement[0]->setNetBalance('1000.00');
+        $statement[0]->setPrice('1.00');
+        $statement[0]->setUnCleared('0.00');
         $statement[0]->setReferenceId('');
         $statement[0]->setReferenceSource('');
         $statement[0]->setAccountTypeId('USDTEST');
 
         $statement[] = new StatementEntity;
-        $statement[1]->setAmount('10.00000');
+        $statement[1]->setAmount('10.00');
         $statement[1]->setDate('2015-01-24');
         $statement[1]->setDescription('Test');
-        $statement[1]->setGrossBalance('990.00000');
+        $statement[1]->setGrossBalance('990.00');
         $statement[1]->setAccountId($accountId);
         $statement[1]->setStatementId($statementId);
         $statement[1]->setTypeId('W');
-        $statement[1]->setNetBalance('990.00000');
-        $statement[1]->setPrice('1.00000');
-        $statement[1]->setUnCleared('0.00000');
+        $statement[1]->setNetBalance('990.00');
+        $statement[1]->setPrice('1.00');
+        $statement[1]->setUnCleared('0.00');
         $statement[1]->setReferenceId('Referencia');
         $statement[1]->setReferenceSource('Source');
         $statement[1]->setAccountTypeId('USDTEST');
 
         $statement[] = new StatementEntity;
-        $statement[2]->setAmount('50.00000');
+        $statement[2]->setAmount('50.00');
         $statement[2]->setDate('2015-01-24');
         $statement[2]->setDescription('Test');
-        $statement[2]->setGrossBalance('940.00000');
+        $statement[2]->setGrossBalance('940.00');
         $statement[2]->setAccountId($accountId);
         $statement[2]->setStatementId(4);
         $statement[2]->setTypeId('W');
-        $statement[2]->setNetBalance('940.00000');
-        $statement[2]->setPrice('1.00000');
-        $statement[2]->setUnCleared('0.00000');
+        $statement[2]->setNetBalance('940.00');
+        $statement[2]->setPrice('1.00');
+        $statement[2]->setUnCleared('0.00');
         $statement[2]->setReferenceId('Referencia');
         $statement[2]->setReferenceSource('Source');
         $statement[2]->setAccountTypeId('USDTEST');
@@ -251,16 +251,69 @@ class AccountStatementsTest extends TestCase
 
         // Check
         $statement = new StatementEntity;
-        $statement->setAmount('250.00000');
+        $statement->setAmount('250.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Add Funds');
-        $statement->setGrossBalance('1250.00000');
+        $statement->setGrossBalance('1250.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('D');
-        $statement->setNetBalance('1250.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('1250.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
+        $statement->setReferenceId('Referencia Add Funds');
+        $statement->setReferenceSource('Source Add Funds');
+        $statement->setAccountTypeId('USDTEST');
+
+        $actual = $this->statementBLL->getById($statementId);
+        $statement->setDate($actual->getDate());
+
+        $this->assertEquals($statement->toArray(), $actual->toArray());
+    }
+
+    public function amountDataProvider()
+    {
+
+        return [
+            [250],
+            [250.00],
+            [250.01],
+            [250.12],
+            [250.18],
+            [250.19],
+            [250.32],
+            [250.41],
+            [2055.49],
+            [10.23456789 - 1.21456789]
+        ];
+    }
+
+    /**
+     * @dataProvider amountDataProvider
+     */
+    public function testAddFundsDecimal($amount)
+    {
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $statementId = $this->statementBLL->addFunds(
+            StatementDTO::create($accountId, $amount)
+                ->setDescription('Test Add Funds')
+                ->setReferenceId('Referencia Add Funds')
+                ->setReferenceSource('Source Add Funds')
+        );
+
+        // Check
+        $statement = new StatementEntity;
+        $statement->setAmount($amount);
+        $statement->setDate('2015-01-24');
+        $statement->setDescription('Test Add Funds');
+        $statement->setGrossBalance(1000 + $amount);
+        $statement->setAccountId($accountId);
+        $statement->setStatementId($statementId);
+        $statement->setTypeId('D');
+        $statement->setNetBalance(1000 + $amount);
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Add Funds');
         $statement->setReferenceSource('Source Add Funds');
         $statement->setAccountTypeId('USDTEST');
@@ -274,12 +327,25 @@ class AccountStatementsTest extends TestCase
     public function testAddFunds_Invalid()
     {
         $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to be greater than zero');
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check;
         $this->statementBLL->addFunds(StatementDTO::create($accountId, -15));
+    }
+
+    public function testAddFunds_InvalidRound()
+    {
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to have two decimal places');
+
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+
+        // Check;
+        $this->statementBLL->addFunds(StatementDTO::create($accountId, 0.105));
     }
 
     public function testWithdrawFunds()
@@ -295,16 +361,16 @@ class AccountStatementsTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('350.00000');
+        $statement->setAmount('350.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('650.00000');
+        $statement->setGrossBalance('650.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('W');
-        $statement->setNetBalance('650.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('650.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
@@ -319,12 +385,25 @@ class AccountStatementsTest extends TestCase
     public function testWithdrawFunds_Invalid()
     {
         $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to be greater than zero');
 
         // Populate Data!
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
 
         // Check
         $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, -15));
+    }
+
+    public function testWithdrawFunds_InvalidRound()
+    {
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Amount needs to have two decimal places');
+
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+
+        // Check
+        $this->statementBLL->withdrawFunds(StatementDTO::create($accountId, 10.001));
     }
 
     public function testWithdrawFunds_Negative()
@@ -340,16 +419,16 @@ class AccountStatementsTest extends TestCase
 
         // Objeto que é esperado
         $statement = new StatementEntity();
-        $statement->setAmount('1150.00000');
+        $statement->setAmount('1150.00');
         $statement->setDate('2015-01-24');
         $statement->setDescription('Test Withdraw');
-        $statement->setGrossBalance('-150.00000');
+        $statement->setGrossBalance('-150.00');
         $statement->setAccountId($accountId);
         $statement->setStatementId($statementId);
         $statement->setTypeId('W');
-        $statement->setNetBalance('-150.00000');
-        $statement->setPrice('1.00000');
-        $statement->setUnCleared('0.00000');
+        $statement->setNetBalance('-150.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
         $statement->setReferenceId('Referencia Withdraw');
         $statement->setReferenceSource('Source Withdraw');
         $statement->setAccountTypeId('USDTEST');
@@ -416,7 +495,7 @@ class AccountStatementsTest extends TestCase
             "price" => 1,
             "extra" => "Extra Information",
             "entrydate" => null,
-            "minvalue" => "0.00000"
+            "minvalue" => "0.00"
         ]);
 
         $this->assertEquals([
@@ -458,7 +537,7 @@ class AccountStatementsTest extends TestCase
             "price" => 1,
             "extra" => "Extra Information",
             "entrydate" => null,
-            "minvalue" => "0.00000"
+            "minvalue" => "0.00"
         ]);
 
         $this->assertEquals([
@@ -480,12 +559,12 @@ class AccountStatementsTest extends TestCase
                 'accountid' => $accountId,
                 'accounttypeid' => 'USDTEST',
                 'userid' => "___TESTUSER-1",
-                'grossbalance' => '650.00000',
-                'uncleared' => '0.00000',
-                'netbalance' => '650.00000',
-                'price' => '1.00000',
+                'grossbalance' => '650.00',
+                'uncleared' => '0.00',
+                'netbalance' => '650.00',
+                'price' => '1.00',
                 'extra' => '',
-                'minvalue' => '0.00000',
+                'minvalue' => '0.00',
             ],
             $account
         );
@@ -496,13 +575,13 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals([
                 'accountid' => $accountId,
                 'accounttypeid' => 'USDTEST',
-                'grossbalance' => '650.00000',
-                'uncleared' => '0.00000',
-                'netbalance' => '650.00000',
-                'price' => '1.00000',
+                'grossbalance' => '650.00',
+                'uncleared' => '0.00',
+                'netbalance' => '650.00',
+                'price' => '1.00',
                 'statementid' => $statementId,
                 'typeid' => 'B',
-                'amount' => '650.00000',
+                'amount' => '650.00',
                 'description' => 'Reset Balance',
                 'statementparentid' => '',
                 'code' => 'BAL',
@@ -527,12 +606,12 @@ class AccountStatementsTest extends TestCase
                 'accountid' => $accountId,
                 'accounttypeid' => 'USDTEST',
                 'userid' => "___TESTUSER-1",
-                'grossbalance' => '650.00000',
-                'uncleared' => '0.00000',
-                'netbalance' => '650.00000',
-                'price' => '1.00000',
+                'grossbalance' => '650.00',
+                'uncleared' => '0.00',
+                'netbalance' => '650.00',
+                'price' => '1.00',
                 'extra' => '',
-                'minvalue' => '0.00000',
+                'minvalue' => '0.00',
             ],
             $account
         );
@@ -543,13 +622,13 @@ class AccountStatementsTest extends TestCase
         $this->assertEquals([
                 'accountid' => $accountId,
                 'accounttypeid' => 'USDTEST',
-                'grossbalance' => '650.00000',
-                'uncleared' => '0.00000',
-                'netbalance' => '650.00000',
-                'price' => '1.00000',
+                'grossbalance' => '650.00',
+                'uncleared' => '0.00',
+                'netbalance' => '650.00',
+                'price' => '1.00',
                 'statementid' => $statementId,
                 'typeid' => 'W',
-                'amount' => '350.00000',
+                'amount' => '350.00',
                 'description' => 'Partial Balance',
                 'statementparentid' => '',
                 'referenceid' => '',
@@ -580,12 +659,12 @@ class AccountStatementsTest extends TestCase
             'accountid' => $accountId,
             'accounttypeid' => 'USDTEST',
             'userid' => "___TESTUSER-1",
-            'grossbalance' => '0.00000',
-            'uncleared' => '0.00000',
-            'netbalance' => '0.00000',
-            'price' => '0.00000',
+            'grossbalance' => '0.00',
+            'uncleared' => '0.00',
+            'netbalance' => '0.00',
+            'price' => '0.00',
             'extra' => '',
-            'minvalue' => '0.00000',
+            'minvalue' => '0.00',
         ],
             $account
         );
@@ -597,13 +676,13 @@ class AccountStatementsTest extends TestCase
             [
                 'accountid' => $accountId,
                 'accounttypeid' => 'USDTEST',
-                'grossbalance' => '0.00000',
-                'uncleared' => '0.00000',
-                'netbalance' => '0.00000',
-                'price' => '0.00000',
+                'grossbalance' => '0.00',
+                'uncleared' => '0.00',
+                'netbalance' => '0.00',
+                'price' => '0.00',
                 'statementid' => $statementId,
                 'typeid' => 'B',
-                'amount' => '0.00000',
+                'amount' => '0.00',
                 'description' => 'Reset Balance',
                 'statementparentid' => '',
                 'referenceid' => '',
@@ -636,13 +715,13 @@ class AccountStatementsTest extends TestCase
                 [
                     'accountid' => $accountId,
                     'accounttypeid' => 'USDTEST',
-                    'grossbalance' => '1000.00000',
-                    'uncleared' => '0.00000',
-                    'netbalance' => '1000.00000',
-                    'price' => '1.00000',
+                    'grossbalance' => '1000.00',
+                    'uncleared' => '0.00',
+                    'netbalance' => '1000.00',
+                    'price' => '1.00',
                     'statementid' => '2',
                     'typeid' => 'D',
-                    'amount' => '1000.00000',
+                    'amount' => '1000.00',
                     'description' => 'Opening Balance',
                     'referenceid' => '',
                     'referencesource' => '',
@@ -652,13 +731,13 @@ class AccountStatementsTest extends TestCase
                 [
                     'accountid' => $accountId,
                     'accounttypeid' => 'USDTEST',
-                    'grossbalance' => '1400.00000',
-                    'uncleared' => '0.00000',
-                    'netbalance' => '1400.00000',
-                    'price' => '1.00000',
+                    'grossbalance' => '1400.00',
+                    'uncleared' => '0.00',
+                    'netbalance' => '1400.00',
+                    'price' => '1.00',
                     'statementid' => '3',
                     'typeid' => 'D',
-                    'amount' => '400.00000',
+                    'amount' => '400.00',
                     'description' => '',
                     'referenceid' => '',
                     'referencesource' => '',
@@ -668,13 +747,13 @@ class AccountStatementsTest extends TestCase
                 [
                     'accountid' => $accountId,
                     'accounttypeid' => 'USDTEST',
-                    'grossbalance' => '1100.00000',
-                    'uncleared' => '0.00000',
-                    'netbalance' => '1100.00000',
-                    'price' => '1.00000',
+                    'grossbalance' => '1100.00',
+                    'uncleared' => '0.00',
+                    'netbalance' => '1100.00',
+                    'price' => '1.00',
                     'statementid' => '4',
                     'typeid' => 'W',
-                    'amount' => '300.00000',
+                    'amount' => '300.00',
                     'description' => '',
                     'referenceid' => '',
                     'referencesource' => '',
@@ -742,13 +821,13 @@ class AccountStatementsTest extends TestCase
                 [
                     'accountid' => $accountId,
                     'accounttypeid' => 'USDTEST',
-                    'grossbalance' => '1400.00000',
-                    'uncleared' => '0.00000',
-                    'netbalance' => '1400.00000',
-                    'price' => '1.00000',
+                    'grossbalance' => '1400.00',
+                    'uncleared' => '0.00',
+                    'netbalance' => '1400.00',
+                    'price' => '1.00',
                     'statementid' => '3',
                     'typeid' => 'D',
-                    'amount' => '400.00000',
+                    'amount' => '400.00',
                     'description' => '',
                     'referenceid' => '',
                     'referencesource' => '',
@@ -791,13 +870,13 @@ class AccountStatementsTest extends TestCase
                 [
                     'accountid' => $accountId,
                     'accounttypeid' => 'USDTEST',
-                    'grossbalance' => '1100.00000',
-                    'uncleared' => '0.00000',
-                    'netbalance' => '1100.00000',
-                    'price' => '1.00000',
+                    'grossbalance' => '1100.00',
+                    'uncleared' => '0.00',
+                    'netbalance' => '1100.00',
+                    'price' => '1.00',
                     'statementid' => '4',
                     'typeid' => 'W',
-                    'amount' => '300.00000',
+                    'amount' => '300.00',
                     'description' => '',
                     'referenceid' => 'REFID2',
                     'referencesource' => 'REFSRC',

@@ -16,7 +16,6 @@ use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
 use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\Serializer\Exception\InvalidArgumentException;
-use ByJG\Serializer\Serialize;
 use Exception;
 
 class StatementBLL
@@ -72,12 +71,7 @@ class StatementBLL
     public function addFunds(StatementDTO $dto): ?int
     {
         // Validations
-        if (!$dto->hasAccount()) {
-            throw new StatementException('Account is required');
-        }
-        if ($dto->getAmount() < 0) {
-            throw new AmountException('Amount needs to be greater or equal than zero');
-        }
+        $this->validateStatementDto($dto);
 
         // Get an Account
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
@@ -96,6 +90,20 @@ class StatementBLL
             $this->getRepository()->getDbDriver()->rollbackTransaction();
 
             throw $ex;
+        }
+    }
+
+    protected function validateStatementDto(StatementDTO $dto): void
+    {
+        if (!$dto->hasAccount()) {
+            throw new StatementException('Account is required');
+        }
+        if ($dto->getAmount() < 0) {
+            throw new AmountException('Amount needs to be greater than zero');
+        }
+
+        if (round($dto->getAmount()*100)/100 != $dto->getAmount()) {
+            throw new AmountException('Amount needs to have two decimal places');
         }
     }
 
@@ -166,12 +174,7 @@ class StatementBLL
     public function withdrawFunds(StatementDTO $dto, bool $allowZeroNoBalance = false): ?int
     {
         // Validations
-        if (!$dto->hasAccount()) {
-            throw new StatementException('Account is required');
-        }
-        if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount needs to be greater than zero');
-        }
+        $this->validateStatementDto($dto);
 
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
@@ -219,12 +222,7 @@ class StatementBLL
     public function reserveFundsForWithdraw(StatementDTO $dto): ?int
     {
         // Validations
-        if (!$dto->hasAccount()) {
-            throw new StatementException('Account is required');
-        }
-        if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount needs to be greater than zero');
-        }
+        $this->validateStatementDto($dto);
 
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
@@ -268,12 +266,7 @@ class StatementBLL
     public function reserveFundsForDeposit(StatementDTO $dto): ?int
     {
         // Validações
-        if (!$dto->hasAccount()) {
-            throw new StatementException('Account is required');
-        }
-        if ($dto->getAmount() <= 0) {
-            throw new AmountException('Amount needs to be greater than zero');
-        }
+        $this->validateStatementDto($dto);
 
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
