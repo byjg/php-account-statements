@@ -176,7 +176,7 @@ class StatementDTO
         return $this;
     }
 
-    public function setProperty(string $name, string $value): static
+    public function setProperty(string $name, ?string $value): static
     {
         $this->properties[$name] = $value;
         return $this;
