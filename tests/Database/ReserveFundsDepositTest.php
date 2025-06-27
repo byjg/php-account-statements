@@ -209,11 +209,33 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
+    public function testAcceptPartialFundsById_AmountMoreThantWithdrawBlocked()
+    {
+        $this->expectException(AmountException::class);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)->setDescription('Test deposit')
+        );
+
+        $accountBefore = $this->accountBLL->getById($accountId);
+        $this->assertEquals('1000.00', $accountBefore->getGrossBalance());
+        $this->assertEquals('900.00', $accountBefore->getNetBalance());
+        $this->assertEquals('100.00', $accountBefore->getUnCleared());
+
+        $this->statementBLL->acceptPartialFundsById(
+            $reserveStatementId,
+            101.00,
+            StatementDTO::createEmpty()->setDescription("Deposit")->setReferenceSource("test-source")
+        );
+
+    }
+
     public function testAcceptPartialFundsById_OK()
     {
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::create($accountId, 100)->setDescription('Deposit')
+            StatementDTO::create($accountId, 100)->setDescription('Test deposit')
         );
 
         $accountBefore = $this->accountBLL->getById($accountId);
@@ -224,7 +246,7 @@ public function testAcceptFundsById_InvalidType()
         $finalDebitStatementId = $this->statementBLL->acceptPartialFundsById(
             $reserveStatementId,
             80.00,
-            StatementDTO::createEmpty()->setDescription("Final deposit")->setReferenceSource("test-source")
+            StatementDTO::createEmpty()->setDescription("Deposit")->setReferenceSource("test-source")
         );
 
         $accountAfter = $this->accountBLL->getById($accountId);
@@ -232,17 +254,16 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals('920.00', $accountAfter->getNetBalance());
         $this->assertEquals('0.00', $accountAfter->getUnCleared());
 
+        $rejectedStatement = $this->statementBLL->getRepository()->getByParentId($reserveStatementId);
+        $this->assertNotNull($rejectedStatement);
+        $this->assertEquals(StatementEntity::REJECT, $rejectedStatement->getTypeId());
+        $this->assertEquals('100.00', $rejectedStatement->getAmount());
+
+        /** @var StatementEntity $finalDebitStatement */
         $finalDebitStatement = $this->statementBLL->getById($finalDebitStatementId);
         $this->assertEquals('80.00', $finalDebitStatement->getAmount());
         $this->assertEquals(StatementEntity::WITHDRAW, $finalDebitStatement->getTypeId());
-        $this->assertEquals("Final deposit", $finalDebitStatement->getDescription());
-        $this->assertEquals($reserveStatementId, $finalDebitStatement->getStatementParentId());
-
-        $refundStatement = $this->statementBLL->getRepository()->getByReferenceId($finalDebitStatement->getAccountId(), $finalDebitStatement->getReferenceSource(), $finalDebitStatement->getStatementId())[0];
-        $this->assertNotNull($refundStatement);
-        $this->assertEquals('20.00', $refundStatement->getAmount());
-        $this->assertEquals(StatementEntity::REJECT, $refundStatement->getTypeId());
-        $this->assertEquals('Partial refund', $refundStatement->getDescription());
+        $this->assertEquals("Deposit", $finalDebitStatement->getDescription());
     }
 
     public function testRejectFundsById_InvalidType()

@@ -391,48 +391,22 @@ class StatementBLL
             }
 
             $originalAmount = $statement->getAmount();
-            if ($partialAmount > $originalAmount) {
-                throw new AmountException('Partial amount cannot be greater than the original reserved amount.');
+            if ($partialAmount <= 0 || $partialAmount >= $originalAmount) {
+                throw new AmountException(
+                    'Partial amount must be greater than zero and less than the original reserved amount.'
+                );
             }
 
-            $refundAmount = $originalAmount - $partialAmount;
+            $this->rejectFundsById($statementId, StatementDTO::createEmpty()->setDescription('Reversal of partial acceptance for reserve ' . $statementId));
 
-            $account = $this->accountRepository->getById($statement->getAccountId());
+            $statementDto->setAmount($partialAmount);
+            $statementDto->setAccountId($statement->getAccountId());
 
-            $account->setUnCleared($account->getUnCleared() - $originalAmount);
-            $account->setGrossBalance($account->getGrossBalance() - $partialAmount);
-
-            $account->setNetBalance($account->getNetBalance() + $refundAmount);
-
-            $this->accountRepository->save($account);
-
-            $statement->setAmount($partialAmount);
-            $statement->setStatementParentId($statement->getStatementId());
-            $statement->setStatementId(null);
-            $statement->setDate(null);
-            $statement->setTypeId(StatementEntity::WITHDRAW);
-            $statement->attachAccount($account);
-            $statementDto->setToStatement($statement);
-            $finalDebitStatement = $this->statementRepository->save($statement);
-
-            $refundDto = StatementDTO::createEmpty()
-                ->setAmount($refundAmount)
-                ->setReferenceId($finalDebitStatement->getStatementId())
-                ->setReferenceSource($statementDto->getReferenceSource())
-                ->setCode('REFUND')
-                ->setDescription('Partial refund')
-                ->setAccountId($account->getAccountId());
-
-            $refundStatement = $this->statementRepository->getRepository()->entity([]);
-            $refundDto->setToStatement($refundStatement);
-            $refundStatement->setAmount($refundAmount);
-            $refundStatement->setTypeId(StatementEntity::REJECT);
-            $refundStatement->attachAccount($account);
-            $this->statementRepository->save($refundStatement);
+            $finalDebitStatementId = $this->withdrawFunds($statementDto);
 
             $this->getRepository()->getDbDriver()->commitTransaction();
 
-            return $finalDebitStatement->getStatementId();
+            return $finalDebitStatementId;
 
         } catch (Exception $ex) {
             $this->getRepository()->getDbDriver()->rollbackTransaction();
