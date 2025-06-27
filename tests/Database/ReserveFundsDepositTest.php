@@ -209,6 +209,42 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
+    public function testAcceptPartialFundsById_OK()
+    {
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)->setDescription('Deposit')
+        );
+
+        $accountBefore = $this->accountBLL->getById($accountId);
+        $this->assertEquals('1000.00', $accountBefore->getGrossBalance());
+        $this->assertEquals('900.00', $accountBefore->getNetBalance());
+        $this->assertEquals('100.00', $accountBefore->getUnCleared());
+
+        $finalDebitStatementId = $this->statementBLL->acceptPartialFundsById(
+            $reserveStatementId,
+            80.00,
+            StatementDTO::createEmpty()->setDescription("Final deposit")->setReferenceSource("test-source")
+        );
+
+        $accountAfter = $this->accountBLL->getById($accountId);
+        $this->assertEquals('920.00', $accountAfter->getGrossBalance());
+        $this->assertEquals('920.00', $accountAfter->getNetBalance());
+        $this->assertEquals('0.00', $accountAfter->getUnCleared());
+
+        $finalDebitStatement = $this->statementBLL->getById($finalDebitStatementId);
+        $this->assertEquals('80.00', $finalDebitStatement->getAmount());
+        $this->assertEquals(StatementEntity::WITHDRAW, $finalDebitStatement->getTypeId());
+        $this->assertEquals("Final deposit", $finalDebitStatement->getDescription());
+        $this->assertEquals($reserveStatementId, $finalDebitStatement->getStatementParentId());
+
+        $refundStatement = $this->statementBLL->getRepository()->getByReferenceId($finalDebitStatement->getAccountId(), $finalDebitStatement->getReferenceSource(), $finalDebitStatement->getStatementId())[0];
+        $this->assertNotNull($refundStatement);
+        $this->assertEquals('20.00', $refundStatement->getAmount());
+        $this->assertEquals(StatementEntity::REJECT, $refundStatement->getTypeId());
+        $this->assertEquals('Partial refund', $refundStatement->getDescription());
+    }
+
     public function testRejectFundsById_InvalidType()
     {
         $this->expectException(StatementException::class);

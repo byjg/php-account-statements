@@ -357,6 +357,90 @@ class StatementBLL
     }
 
     /**
+     * @param int $statementId
+     * @param float $partialAmount
+     * @param StatementDTO|null $statementDto
+     * @return int
+     * @throws AccountException
+     * @throws AmountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     */
+    public function acceptPartialFundsById(int $statementId, float $partialAmount, StatementDTO $statementDto = null): int
+    {
+        if (is_null($statementDto)) {
+            $statementDto = StatementDTO::createEmpty();
+        }
+
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
+        try {
+            $statement = $this->statementRepository->getById($statementId);
+            if (is_null($statement)) {
+                throw new StatementException('acceptPartialFundsById: Statement not found');
+            }
+            if ($statement->getTypeId() != StatementEntity::WITHDRAW_BLOCKED) {
+                throw new StatementException("The statement id doesn't belong to a reserved withdraw fund.");
+            }
+            if ($this->statementRepository->getByParentId($statementId) != null) {
+                throw new StatementException('The statement has been processed already');
+            }
+
+            $originalAmount = $statement->getAmount();
+            if ($partialAmount > $originalAmount) {
+                throw new AmountException('Partial amount cannot be greater than the original reserved amount.');
+            }
+
+            $refundAmount = $originalAmount - $partialAmount;
+
+            $account = $this->accountRepository->getById($statement->getAccountId());
+
+            $account->setUnCleared($account->getUnCleared() - $originalAmount);
+            $account->setGrossBalance($account->getGrossBalance() - $partialAmount);
+
+            $account->setNetBalance($account->getNetBalance() + $refundAmount);
+
+            $this->accountRepository->save($account);
+
+            $statement->setAmount($partialAmount);
+            $statement->setStatementParentId($statement->getStatementId());
+            $statement->setStatementId(null);
+            $statement->setDate(null);
+            $statement->setTypeId(StatementEntity::WITHDRAW);
+            $statement->attachAccount($account);
+            $statementDto->setToStatement($statement);
+            $finalDebitStatement = $this->statementRepository->save($statement);
+
+            $refundDto = StatementDTO::createEmpty()
+                ->setAmount($refundAmount)
+                ->setReferenceId($finalDebitStatement->getStatementId())
+                ->setReferenceSource($statementDto->getReferenceSource())
+                ->setCode('REFUND')
+                ->setDescription('Partial refund')
+                ->setAccountId($account->getAccountId());
+
+            $refundStatement = $this->statementRepository->getRepository()->entity([]);
+            $refundDto->setToStatement($refundStatement);
+            $refundStatement->setAmount($refundAmount);
+            $refundStatement->setTypeId(StatementEntity::REJECT);
+            $refundStatement->attachAccount($account);
+            $this->statementRepository->save($refundStatement);
+
+            $this->getRepository()->getDbDriver()->commitTransaction();
+
+            return $finalDebitStatement->getStatementId();
+
+        } catch (Exception $ex) {
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
+            throw $ex;
+        }
+    }
+
+    /**
      * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
