@@ -286,7 +286,7 @@ class StatementBLL
      * Accept a reserved fund and update gross balance
      *
      * @param int $statementId
-     * @param null $statementDto
+     * @param StatementDTO|null $statementDto
      * @return int Statement ID
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
@@ -296,7 +296,7 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptFundsById(int $statementId, $statementDto = null): int
+    public function acceptFundsById(int $statementId, ?StatementDTO $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();
@@ -352,10 +352,72 @@ class StatementBLL
     }
 
     /**
+     * @param int $statementId
+     * @param StatementDTO|null $statementDto
+     * @return int|null
+     * @throws AccountException
+     * @throws AmountException
+     * @throws InvalidArgumentException
+     * @throws OrmBeforeInvalidException
+     * @throws OrmInvalidFieldsException
+     * @throws RepositoryReadOnlyException
+     * @throws StatementException
+     * @throws UpdateConstraintException
+     * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
+     */
+    public function acceptPartialFundsById(int $statementId, ?StatementDTO $statementDto): ?int
+    {
+        if (is_null($statementDto)) {
+            throw new StatementException('acceptPartialFundsById: StatementDTO cannot be null.');
+        }
+
+        $partialAmount = $statementDto->getAmount();
+
+        if ($partialAmount <= 0) {
+            throw new AmountException('Partial amount must be greater than zero.');
+        }
+
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
+        try {
+            $statement = $this->statementRepository->getById($statementId);
+            if (is_null($statement)) {
+                throw new StatementException('acceptPartialFundsById: Statement not found');
+            }
+            if ($statement->getTypeId() != StatementEntity::WITHDRAW_BLOCKED) {
+                throw new StatementException("The statement id doesn't belong to a reserved withdraw fund.");
+            }
+            if ($this->statementRepository->getByParentId($statementId) != null) {
+                throw new StatementException('The statement has been processed already');
+            }
+
+            $originalAmount = $statement->getAmount();
+            if ($partialAmount <= 0 || $partialAmount >= $originalAmount) {
+                throw new AmountException(
+                    'Partial amount must be greater than zero and less than the original reserved amount.'
+                );
+            }
+
+            $this->rejectFundsById($statementId, StatementDTO::createEmpty()->setDescription('Reversal of partial acceptance for reserve ' . $statementId));
+
+            $statementDto->setAccountId($statement->getAccountId());
+
+            $finalDebitStatementId = $this->withdrawFunds($statementDto);
+
+            $this->getRepository()->getDbDriver()->commitTransaction();
+
+            return $finalDebitStatementId;
+
+        } catch (Exception $ex) {
+            $this->getRepository()->getDbDriver()->rollbackTransaction();
+            throw $ex;
+        }
+    }
+
+    /**
      * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
-     * @param null $statementDto
+     * @param StatementDTO|null $statementDto
      * @return int Statement ID
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
@@ -365,7 +427,7 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function rejectFundsById(int $statementId, $statementDto = null): int
+    public function rejectFundsById(int $statementId, ?StatementDTO $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();

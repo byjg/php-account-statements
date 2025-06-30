@@ -209,6 +209,79 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
+    public function testAcceptPartialFundsById_StatementDTONull()
+    {
+        $this->expectException(StatementException::class);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)
+        );
+
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, null);
+    }
+
+    public function testAcceptPartialFundsById_PartialAmountZero()
+    {
+        $this->expectException(AmountException::class);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)
+        );
+
+        $statementDTO = StatementDTO::createEmpty()->setAmount(0);
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, $statementDTO);
+    }
+
+    public function testAcceptPartialFundsById_AmountMoreThanWithdrawBlocked()
+    {
+        $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Partial amount must be greater than zero and less than the original reserved amount.');
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)
+        );
+
+        $statementDTO = StatementDTO::createEmpty()->setAmount(100.01);
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, $statementDTO);
+    }
+
+    public function testAcceptPartialFundsById_OK()
+    {
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)->setDescription('Reserva para Aposta')
+        );
+
+        $statementDTO = StatementDTO::createEmpty()
+            ->setAmount(80.00)
+            ->setDescription("Deposit")
+            ->setReferenceSource("test-source");
+
+        $finalDebitStatementId = $this->statementBLL->acceptPartialFundsById(
+            $reserveStatementId,
+            $statementDTO
+        );
+
+        $accountAfter = $this->accountBLL->getById($accountId);
+        $this->assertEquals('920.00', $accountAfter->getGrossBalance());
+        $this->assertEquals('920.00', $accountAfter->getNetBalance());
+        $this->assertEquals('0.00', $accountAfter->getUnCleared());
+
+        $rejectedStatement = $this->statementBLL->getRepository()->getByParentId($reserveStatementId);
+        $this->assertNotNull($rejectedStatement);
+        $this->assertEquals(StatementEntity::REJECT, $rejectedStatement->getTypeId());
+        $this->assertEquals('100.00', $rejectedStatement->getAmount());
+
+        /** @var StatementEntity $finalDebitStatement */
+        $finalDebitStatement = $this->statementBLL->getById($finalDebitStatementId);
+        $this->assertEquals('80.00', $finalDebitStatement->getAmount());
+        $this->assertEquals(StatementEntity::WITHDRAW, $finalDebitStatement->getTypeId());
+        $this->assertEquals("Deposit", $finalDebitStatement->getDescription());
+    }
+
     public function testRejectFundsById_InvalidType()
     {
         $this->expectException(StatementException::class);
