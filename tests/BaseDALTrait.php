@@ -79,6 +79,9 @@ trait BaseDALTrait
         $migration->prepareEnvironment();
         $migration->reset();
 
+        $migration->getDbDriver()->execute("CREATE TABLE statement_extended LIKE statement");
+        $migration->getDbDriver()->execute("alter table statement_extended add extra_property varchar(100) null;");
+
         $this->dbDriver = $migration->getDbDriver();
     }
 

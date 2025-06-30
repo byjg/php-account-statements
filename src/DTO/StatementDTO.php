@@ -15,6 +15,8 @@ class StatementDTO
     protected ?string $referenceId = null;
     protected ?string $referenceSource = null;
     protected ?string $code = null;
+    
+    protected array $properties = [];
 
     /**
      * StatementDTO constructor.
@@ -44,6 +46,12 @@ class StatementDTO
 
     public function setToStatement(StatementEntity $statement): void
     {
+        if (!empty($this->getAccountId())) {
+            $statement->setAccountId($this->getAccountId());
+        }
+        if (!empty($this->getAmount()) || $this->getAmount() === 0.0) {
+            $statement->setAmount($this->getAmount());
+        }
         if (!empty($this->getDescription())) {
             $statement->setDescription($this->getDescription());
         }
@@ -55,6 +63,16 @@ class StatementDTO
         }
         if (!empty($this->getReferenceSource())) {
             $statement->setReferenceSource($this->getReferenceSource());
+        }
+
+        foreach ($this->getProperties() as $name => $value) {
+            if (method_exists($statement, "set$name")) {
+                $statement->{"set$name"}($value);
+            } else if (property_exists($statement, $name)) {
+                $statement->{$name} = $value;
+            } else {
+                throw new \InvalidArgumentException("Property $name not found in StatementEntity");
+            }
         }
     }
 
@@ -158,5 +176,15 @@ class StatementDTO
         return $this;
     }
 
+    public function setProperty(string $name, ?string $value): static
+    {
+        $this->properties[$name] = $value;
+        return $this;
+    }
+    
+    public function getProperties(): array
+    {
+        return $this->properties;
+    }
 
 }

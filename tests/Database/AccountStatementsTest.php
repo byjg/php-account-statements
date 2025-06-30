@@ -15,6 +15,7 @@ use ByJG\MicroOrm\Exception\TransactionException;
 use ByJG\Serializer\Serialize;
 use PHPUnit\Framework\TestCase;
 use Tests\BaseDALTrait;
+use Tests\Classes\StatementExtended;
 
 
 class AccountStatementsTest extends TestCase
@@ -984,6 +985,43 @@ class AccountStatementsTest extends TestCase
             $this->dbDriver->rollbackTransaction();
         }
 
+    }
+
+    public function testAddFundsExtendedStatement()
+    {
+        $this->prepareObjects(statementEntity: StatementExtended::class);
+
+        // Populate Data!
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $statementId = $this->statementBLL->addFunds(
+            StatementDTO::create($accountId, 250)
+                ->setDescription('Test Add Funds')
+                ->setReferenceId('Referencia Add Funds')
+                ->setReferenceSource('Source Add Funds')
+                ->setProperty('extraProperty', 'Extra')
+        );
+
+        // Check
+        $statement = new StatementExtended();
+        $statement->setAmount('250.00');
+        $statement->setDate('2015-01-24');
+        $statement->setDescription('Test Add Funds');
+        $statement->setGrossBalance('1250.00');
+        $statement->setAccountId($accountId);
+        $statement->setStatementId($statementId);
+        $statement->setTypeId('D');
+        $statement->setNetBalance('1250.00');
+        $statement->setPrice('1.00');
+        $statement->setUnCleared('0.00');
+        $statement->setReferenceId('Referencia Add Funds');
+        $statement->setReferenceSource('Source Add Funds');
+        $statement->setAccountTypeId('USDTEST');
+        $statement->setExtraProperty('Extra');
+
+        $actual = $this->statementBLL->getById($statementId);
+        $statement->setDate($actual->getDate());
+
+        $this->assertEquals($statement, $actual);
     }
 
 }

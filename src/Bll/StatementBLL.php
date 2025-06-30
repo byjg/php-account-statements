@@ -142,12 +142,7 @@ class StatementBLL
         // Add the new line
         /** @var StatementEntity $statement */
         $statement = $this->statementRepository->getRepository()->entity([]);
-        $statement->setAccountId($dto->getAccountId());
-        $statement->setAmount($dto->getAmount());
-        $statement->setCode($dto->getCode());
-        $statement->setDescription($dto->getDescription());
-        $statement->setReferenceSource($dto->getReferenceSource());
-        $statement->setReferenceId($dto->getReferenceId());
+        $dto->setToStatement($statement);
         $statement->setTypeId($operation);
         $statement->attachAccount($account);
 
