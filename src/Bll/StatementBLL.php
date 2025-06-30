@@ -360,7 +360,7 @@ class StatementBLL
      * @param int $statementId
      * @param float $partialAmount
      * @param StatementDTO|null $statementDto
-     * @return int
+     * @return int|null
      * @throws AccountException
      * @throws AmountException
      * @throws InvalidArgumentException
@@ -371,7 +371,7 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptPartialFundsById(int $statementId, StatementDTO $statementDto = null): int
+    public function acceptPartialFundsById(int $statementId, StatementDTO $statementDto = null): ?int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();

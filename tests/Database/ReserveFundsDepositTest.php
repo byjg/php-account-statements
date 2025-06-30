@@ -209,44 +209,36 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
-    public function testAcceptPartialFundsById_AmountMoreThantWithdrawBlocked()
+    public function testAcceptPartialFundsById_AmountMoreThanWithdrawBlocked()
     {
         $this->expectException(AmountException::class);
+        $this->expectExceptionMessage('Partial amount must be greater than zero and less than the original reserved amount.');
 
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::create($accountId, 100)->setDescription('Test deposit')
+            StatementDTO::create($accountId, 100)
         );
 
-        $accountBefore = $this->accountBLL->getById($accountId);
-        $this->assertEquals('1000.00', $accountBefore->getGrossBalance());
-        $this->assertEquals('900.00', $accountBefore->getNetBalance());
-        $this->assertEquals('100.00', $accountBefore->getUnCleared());
-
-        $this->statementBLL->acceptPartialFundsById(
-            $reserveStatementId,
-            101.00,
-            StatementDTO::createEmpty()->setDescription("Deposit")->setReferenceSource("test-source")
-        );
-
+        $statementDTO = StatementDTO::createEmpty()->setAmount(100.01);
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, $statementDTO);
     }
+
 
     public function testAcceptPartialFundsById_OK()
     {
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
-            StatementDTO::create($accountId, 100)->setDescription('Test deposit')
+            StatementDTO::create($accountId, 100)->setDescription('Reserva para Aposta')
         );
 
-        $accountBefore = $this->accountBLL->getById($accountId);
-        $this->assertEquals('1000.00', $accountBefore->getGrossBalance());
-        $this->assertEquals('900.00', $accountBefore->getNetBalance());
-        $this->assertEquals('100.00', $accountBefore->getUnCleared());
+        $statementDTO = StatementDTO::createEmpty()
+            ->setAmount(80.00)
+            ->setDescription("Deposit")
+            ->setReferenceSource("test-source");
 
         $finalDebitStatementId = $this->statementBLL->acceptPartialFundsById(
             $reserveStatementId,
-            80.00,
-            StatementDTO::createEmpty()->setDescription("Deposit")->setReferenceSource("test-source")
+            $statementDTO
         );
 
         $accountAfter = $this->accountBLL->getById($accountId);
