@@ -371,10 +371,12 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptPartialFundsById(int $statementId, StatementDTO $statementDto = null): ?int
+    public function acceptPartialFundsById(int $statementId, StatementDTO $statementDto): ?int
     {
-        if (is_null($statementDto)) {
-            $statementDto = StatementDTO::createEmpty();
+        $partialAmount = $statementDto->getAmount();
+
+        if ($partialAmount <= 0) {
+            throw new AmountException('Partial amount must be greater than zero.');
         }
 
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
@@ -390,7 +392,6 @@ class StatementBLL
                 throw new StatementException('The statement has been processed already');
             }
 
-            $partialAmount = $statementDto->getAmount();
             $originalAmount = $statement->getAmount();
             if ($partialAmount <= 0 || $partialAmount >= $originalAmount) {
                 throw new AmountException(

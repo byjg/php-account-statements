@@ -209,6 +209,31 @@ public function testAcceptFundsById_InvalidType()
         $this->assertEquals($statement->toArray(), $actual->toArray());
     }
 
+    public function testAcceptPartialFundsById_StatementDTONull()
+    {
+        $this->expectException(\TypeError::class);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)
+        );
+
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, null);
+    }
+
+    public function testAcceptPartialFundsById_PartialAmountZero()
+    {
+        $this->expectException(AmountException::class);
+
+        $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
+        $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(
+            StatementDTO::create($accountId, 100)
+        );
+
+        $statementDTO = StatementDTO::createEmpty()->setAmount(0);
+        $this->statementBLL->acceptPartialFundsById($reserveStatementId, $statementDTO);
+    }
+
     public function testAcceptPartialFundsById_AmountMoreThanWithdrawBlocked()
     {
         $this->expectException(AmountException::class);
@@ -222,7 +247,6 @@ public function testAcceptFundsById_InvalidType()
         $statementDTO = StatementDTO::createEmpty()->setAmount(100.01);
         $this->statementBLL->acceptPartialFundsById($reserveStatementId, $statementDTO);
     }
-
 
     public function testAcceptPartialFundsById_OK()
     {
