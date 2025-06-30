@@ -211,7 +211,7 @@ public function testAcceptFundsById_InvalidType()
 
     public function testAcceptPartialFundsById_StatementDTONull()
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(StatementException::class);
 
         $accountId = $this->accountBLL->createAccount('USDTEST', "___TESTUSER-1", 1000);
         $reserveStatementId = $this->statementBLL->reserveFundsForWithdraw(

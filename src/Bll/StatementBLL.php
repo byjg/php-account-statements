@@ -291,7 +291,7 @@ class StatementBLL
      * Accept a reserved fund and update gross balance
      *
      * @param int $statementId
-     * @param null $statementDto
+     * @param StatementDTO|null $statementDto
      * @return int Statement ID
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
@@ -301,7 +301,7 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptFundsById(int $statementId, $statementDto = null): int
+    public function acceptFundsById(int $statementId, ?StatementDTO $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();
@@ -358,7 +358,7 @@ class StatementBLL
 
     /**
      * @param int $statementId
-     * @param StatementDTO $statementDto
+     * @param StatementDTO|null $statementDto
      * @return int|null
      * @throws AccountException
      * @throws AmountException
@@ -370,8 +370,12 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function acceptPartialFundsById(int $statementId, StatementDTO $statementDto): ?int
+    public function acceptPartialFundsById(int $statementId, ?StatementDTO $statementDto): ?int
     {
+        if (is_null($statementDto)) {
+            throw new StatementException('acceptPartialFundsById: StatementDTO cannot be null.');
+        }
+
         $partialAmount = $statementDto->getAmount();
 
         if ($partialAmount <= 0) {
@@ -418,7 +422,7 @@ class StatementBLL
      * Reject a reserved fund and return the net balance
      *
      * @param int $statementId
-     * @param null $statementDto
+     * @param StatementDTO|null $statementDto
      * @return int Statement ID
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
@@ -428,7 +432,7 @@ class StatementBLL
      * @throws UpdateConstraintException
      * @throws \ByJG\MicroOrm\Exception\InvalidArgumentException
      */
-    public function rejectFundsById(int $statementId, $statementDto = null): int
+    public function rejectFundsById(int $statementId, ?StatementDTO $statementDto = null): int
     {
         if (is_null($statementDto)) {
             $statementDto = StatementDTO::createEmpty();
