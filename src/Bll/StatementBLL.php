@@ -359,7 +359,7 @@ class StatementBLL
     /**
      * @param int $statementId
      * @param float $partialAmount
-     * @param StatementDTO|null $statementDto
+     * @param StatementDTO $statementDto
      * @return int|null
      * @throws AccountException
      * @throws AmountException
