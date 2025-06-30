@@ -401,7 +401,6 @@ class StatementBLL
 
             $this->rejectFundsById($statementId, StatementDTO::createEmpty()->setDescription('Reversal of partial acceptance for reserve ' . $statementId));
 
-            $statementDto->setAmount($partialAmount);
             $statementDto->setAccountId($statement->getAccountId());
 
             $finalDebitStatementId = $this->withdrawFunds($statementDto);
