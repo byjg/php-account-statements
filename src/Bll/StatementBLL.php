@@ -106,50 +106,81 @@ class StatementBLL
         $accountUpdate = $this->getAccountUpdateQuery($dto);
 
         // 3) Execute both queries atomically
+        $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, allowJoin: true);
         try {
             $this->getRepository()->bulkExecute([
                 $statementInsert,
                 $accountUpdate,
             ])->toArray();
 
-            // 4) Notify observers of account change, providing an oldAccount with pre-change balances
+            // 4) Load the account just updated
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (empty($account)) {
                 throw new AccountException('Account not found');
             }
 
-            $oldAccount = clone $account;
-            $oldAccount->setGrossbalance($oldAccount->getGrossbalance() - $grossDelta);
-            $oldAccount->setUncleared($oldAccount->getUncleared() - $unclearedDelta);
-            $oldAccount->setNetbalance($oldAccount->getNetbalance() - $netDelta);
-
-            ORMSubject::getInstance()->notify(
-                $this->accountRepository->getMapper()->getTable(),
-                ORMSubject::EVENT_UPDATE,
-                $account,
-                $oldAccount
-            );
-
-            // 5) Load the statement just created to notify and return
+            // 5) Load the statement just created
             $statement = $this->statementRepository->getById($account->getLastStatementId());
 
-            ORMSubject::getInstance()->notify(
-                $this->statementRepository->getMapper()->getTable(),
-                ORMSubject::EVENT_INSERT,
-                $statement,
-                null
-            );
+            // Validate that the persisted statement matches the DTO intent (allowing capped withdraw amount)
+            $mismatches = [];
+            if ((int)$statement->getAccountId() !== (int)$dto->getAccountId()) { $mismatches[] = 'accountId'; }
+            if ($statement->getDescription() !== $dto->getDescription()) { $mismatches[] = 'description'; }
+            if ($statement->getCode() !== $dto->getCode()) { $mismatches[] = 'code'; }
+            if ($statement->getReferenceId() !== $dto->getReferenceId()) { $mismatches[] = 'referenceId'; }
+            if ($statement->getReferenceSource() !== $dto->getReferenceSource()) { $mismatches[] = 'referenceSource'; }
+            if ($statement->getTypeId() !== $operation) { $mismatches[] = 'typeId'; }
+            $amountMatches = (abs((float)$statement->getAmount() - (float)$dto->getAmount()) < 0.00001) || ($capAtZero && $operation === StatementEntity::WITHDRAW);
+            if (!$amountMatches) { $mismatches[] = 'amount'; }
+            foreach ($dto->getProperties() as $propertyName => $propertyValue) {
+                $fieldMap = $this->statementRepository->getMapper()->getFieldMap($propertyName);
+                if ($fieldMap && $fieldMap->isSyncWithDb()) {
+                    $fieldName = "get" . $fieldMap->getPropertyName();
+                    if ($statement->$fieldName() !== $propertyValue) {
+                        $mismatches[] = $fieldName;
+                    }
+                }
+            }
+            if (!empty($mismatches)) {
+                throw new StatementException('Persisted statement does not match the DTO fields: ' . implode(', ', $mismatches));
+            }
 
-            // If capping occurred on withdraw, the actual amount may differ from the DTO amount
-            $dto->setAmount($statement->getAmount());
-
-            return $statement;
-        } catch (\PDOException $ex) {
-            if (strpos($ex->getMessage(), 'chk_value_nonnegative') !== false) {
+            $this->getRepository()->getDbDriver()->commitTransaction();
+        } catch (Exception $ex) {
+            if ($this->getRepository()->getDbDriver()->hasActiveTransaction()) {
+                $this->getRepository()->getDbDriver()->rollbackTransaction();
+            }
+            if ($ex instanceof \PDOException && strpos($ex->getMessage(), 'chk_value_nonnegative') !== false) {
                 throw new AmountException('Cannot withdraw above the account balance');
             }
             throw $ex;
         }
+
+        // 6) Notify observers of account change, providing an oldAccount with pre-change balances
+        $oldAccount = clone $account;
+        $oldAccount->setGrossbalance($oldAccount->getGrossbalance() - $grossDelta);
+        $oldAccount->setUncleared($oldAccount->getUncleared() - $unclearedDelta);
+        $oldAccount->setNetbalance($oldAccount->getNetbalance() - $netDelta);
+
+        ORMSubject::getInstance()->notify(
+            $this->accountRepository->getMapper()->getTable(),
+            ORMSubject::EVENT_UPDATE,
+            $account,
+            $oldAccount
+        );
+
+        // 7) Notify observers of statement insert
+        ORMSubject::getInstance()->notify(
+            $this->statementRepository->getMapper()->getTable(),
+            ORMSubject::EVENT_INSERT,
+            $statement,
+            null
+        );
+
+        // If capping occurred on withdraw, the actual amount may differ from the DTO amount
+        $dto->setAmount($statement->getAmount());
+
+        return $statement;
     }
 
     // ---- Helpers: computations and query building ---------------------------------------------------------------
@@ -296,7 +327,8 @@ class StatementBLL
                 'referenceid' => $dto->getReferenceId(),
                 'referencesource' => $dto->getReferenceSource(),
                 'operation' => $operation,
-            ]);
+            ])
+            ->forUpdate();
 
         return InsertSelectQuery::getInstance(
             $this->statementRepository->getMapper()->getTable(),
