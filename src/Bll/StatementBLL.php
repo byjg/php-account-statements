@@ -194,7 +194,7 @@ class StatementBLL
         );
 
         // If capping occurred on withdraw, the actual amount may differ from the DTO amount
-        $dto->setAmount($statement->getAmount());
+        $dto->setAmount(floatval($statement->getAmount()));
 
         return $statement;
     }
