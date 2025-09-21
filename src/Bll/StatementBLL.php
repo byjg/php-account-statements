@@ -3,6 +3,7 @@
 namespace ByJG\AccountStatements\Bll;
 
 use ByJG\AccountStatements\DTO\StatementDTO;
+use ByJG\AccountStatements\Entity\AccountEntity;
 use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AmountException;
@@ -15,6 +16,7 @@ use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
 use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\MicroOrm\InsertSelectQuery;
+use ByJG\MicroOrm\Literal\HexUuidLiteral;
 use ByJG\MicroOrm\ORMSubject;
 use ByJG\MicroOrm\Query;
 use ByJG\MicroOrm\UpdateQuery;
@@ -68,6 +70,8 @@ class StatementBLL
         if (round($dto->getAmount()*100)/100 != $dto->getAmount()) {
             throw new AmountException('Amount needs to have two decimal places');
         }
+
+        $dto->setUuid($dto->calculateUuid($this->statementRepository->getDbDriver()));
     }
 
     /**
@@ -111,16 +115,26 @@ class StatementBLL
             $this->getRepository()->bulkExecute([
                 $statementInsert,
                 $accountUpdate,
-            ])->toArray();
+            ]);
 
             // 4) Load the account just updated
+            /** @var AccountEntity $account */
             $account = $this->accountRepository->getById($dto->getAccountId());
             if (empty($account)) {
-                throw new AccountException('Account not found');
+                throw new AccountException('Transaction Failed: Account not found');
+            }
+            if (empty($account->getLastUuid())) {
+                throw new AccountException('Transaction Failed: Account last_uuid is empty');
+            }
+            if (HexUuidLiteral::getFormattedUuid($account->getLastUuid()) !== HexUuidLiteral::getFormattedUuid($dto->getUuid())) {
+                throw new AccountException('Transaction Failed: Account last_uuid does not match the DTO');
             }
 
             // 5) Load the statement just created
-            $statement = $this->statementRepository->getById($account->getLastStatementId());
+            $statement = $this->statementRepository->getByUuid($dto->getUuid());
+            if (empty($statement)) {
+                throw new StatementException('Transaction Failed: Statement not found');
+            }
 
             // Validate that the persisted statement matches the DTO intent (allowing capped withdraw amount)
             $mismatches = [];
@@ -130,7 +144,9 @@ class StatementBLL
             if ($statement->getReferenceId() !== $dto->getReferenceId()) { $mismatches[] = 'referenceId'; }
             if ($statement->getReferenceSource() !== $dto->getReferenceSource()) { $mismatches[] = 'referenceSource'; }
             if ($statement->getTypeId() !== $operation) { $mismatches[] = 'typeId'; }
-            $amountMatches = (abs((float)$statement->getAmount() - (float)$dto->getAmount()) < 0.00001) || ($capAtZero && $operation === StatementEntity::WITHDRAW);
+            $amountMatches =
+                (abs((float)$statement->getAmount() - (float)$dto->getAmount()) < 0.00001) ||
+                ($capAtZero && $operation === StatementEntity::WITHDRAW && $statement->getAmount() <= $dto->getAmount());
             if (!$amountMatches) { $mismatches[] = 'amount'; }
             foreach ($dto->getProperties() as $propertyName => $propertyValue) {
                 $fieldMap = $this->statementRepository->getMapper()->getFieldMap($propertyName);
@@ -259,17 +275,6 @@ class StatementBLL
         }
     }
 
-    /**
-     * Subquery selecting the last inserted statement to update account fields with.
-     */
-    private function buildLastInsertedStatementSnapshotQuery(): Query
-    {
-        return Query::getInstance()
-            ->table($this->statementRepository->getMapper()->getTable())
-            ->fields(['statementid', 'accountid', 'grossbalance', 'netbalance', 'uncleared'])
-            ->where('statementid = (' . $this->statementRepository->getDbDriver()->getDbHelper()->getSqlLastInsertId() . ')');
-    }
-
     protected function getInsertStatementQuery(
         string $operation,
         StatementDTO $dto,
@@ -295,6 +300,7 @@ class StatementBLL
             'typeid',
             'date',
             'statementparentid',
+            'uuid'
         ];
 
         $selectFields = [
@@ -312,6 +318,7 @@ class StatementBLL
             ':operation',
             $this->statementRepository->getDbDriver()->getDbHelper()->sqlDate('Y-m-d H:i:s'),
             'null',
+            ':uuid'
         ];
 
         // Append any extra mapped fields provided via DTO properties (for extended entities)
@@ -327,6 +334,7 @@ class StatementBLL
                 'referenceid' => $dto->getReferenceId(),
                 'referencesource' => $dto->getReferenceSource(),
                 'operation' => $operation,
+                'uuid' => $dto->getUuid()
             ])
             ->forUpdate();
 
@@ -338,16 +346,16 @@ class StatementBLL
 
     public function getAccountUpdateQuery(StatementDTO $dto): UpdateQuery
     {
-        $statementSnapshot = $this->buildLastInsertedStatementSnapshotQuery();
+        $uuid = new HexUuidLiteral($dto->getUuid());
 
         return UpdateQuery::getInstance()
             ->table('account')
             ->setLiteral('account.grossbalance', 'st.grossbalance')
             ->setLiteral('account.uncleared', 'st.uncleared')
             ->setLiteral('account.netbalance', 'st.netbalance')
-            ->setLiteral('account.laststatementid', 'st.statementid')
+            ->setLiteral('account.last_uuid', $uuid)
             ->where('account.accountid = :accid', ['accid' => $dto->getAccountId()])
-            ->join($statementSnapshot, 'st.accountid = account.accountid', 'st');
+            ->join($this->statementRepository->getMapper()->getTable(), 'st.accountid = account.accountid and st.uuid = ' . $uuid, 'st');
     }
 
     /**
@@ -437,6 +445,7 @@ class StatementBLL
 
         $this->getRepository()->getDbDriver()->beginTransaction(IsolationLevelEnum::SERIALIZABLE, true);
         try {
+            /** @var StatementEntity $statement */
             $statement = $this->statementRepository->getById($statementId);
             if (is_null($statement)) {
                 throw new StatementException('acceptFundsById: Statement not found');
@@ -471,6 +480,7 @@ class StatementBLL
             $statement->setDate(null);
             $statement->setTypeId($statement->getTypeId() == StatementEntity::WITHDRAW_BLOCKED ? StatementEntity::WITHDRAW : StatementEntity::DEPOSIT);
             $statement->attachAccount($account);
+            $statementDto->setUuid($statementDto->calculateUuid($this->statementRepository->getDbDriver()));
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
@@ -599,6 +609,7 @@ class StatementBLL
             $statement->setDate(null);
             $statement->setTypeId(StatementEntity::REJECT);
             $statement->attachAccount($account);
+            $statementDto->setUuid($statementDto->calculateUuid($this->statementRepository->getDbDriver()));
             $statementDto->setToStatement($statement);
             $result = $this->statementRepository->save($statement);
 
