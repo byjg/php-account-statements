@@ -11,6 +11,7 @@ use ByJG\AccountStatements\Entity\StatementEntity;
 use ByJG\AccountStatements\Exception\AccountException;
 use ByJG\AccountStatements\Exception\AccountTypeException;
 use ByJG\AccountStatements\Exception\AmountException;
+use ByJG\AccountStatements\Exception\StatementException;
 use ByJG\AccountStatements\Repository\AccountRepository;
 use ByJG\AccountStatements\Repository\AccountTypeRepository;
 use ByJG\AccountStatements\Repository\StatementRepository;
@@ -21,7 +22,8 @@ use ByJG\MicroOrm\Exception\InvalidArgumentException;
 use ByJG\MicroOrm\Exception\OrmBeforeInvalidException;
 use ByJG\MicroOrm\Exception\OrmInvalidFieldsException;
 use ByJG\MicroOrm\Exception\OrmModelInvalidException;
-use ByJG\MicroOrm\Exception\TransactionException;
+use ByJG\MicroOrm\Exception\RepositoryReadOnlyException;
+use ByJG\MicroOrm\Exception\UpdateConstraintException;
 use ByJG\Util\Uri;
 use ReflectionException;
 
@@ -77,7 +79,13 @@ trait BaseDALTrait
 
         $migration = new Migration($this->uri, __DIR__ . "/../db");
         $migration->prepareEnvironment();
-        $migration->reset();
+        // This will delete the constraint to validate the negative amount
+        $maxVersion = null;
+        /** @psalm-suppress InternalMethod */
+        if (strpos($this->getName(), "Allow_Negativ") !== false) {
+            $maxVersion = 3;
+        }
+        $migration->reset($maxVersion);
 
         $migration->getDbDriver()->execute("CREATE TABLE statement_extended LIKE statement");
         $migration->getDbDriver()->execute("alter table statement_extended add extra_property varchar(100) null;");
@@ -109,7 +117,9 @@ trait BaseDALTrait
      * @throws InvalidArgumentException
      * @throws OrmBeforeInvalidException
      * @throws OrmInvalidFieldsException
-     * @throws TransactionException
+     * @throws StatementException
+     * @throws RepositoryReadOnlyException
+     * @throws UpdateConstraintException
      * @throws \ByJG\Serializer\Exception\InvalidArgumentException
      */
     protected function createDummyData()
@@ -126,9 +136,14 @@ trait BaseDALTrait
         $dto3->setAccountTypeId('ABCTEST');
         $dto3->setName('Test 3');
 
+        $dto4 = new AccountTypeEntity();
+        $dto4->setAccountTypeId('NEGTEST');
+        $dto4->setName('Test 4');
+
         $this->accountTypeBLL->update($dto1);
         $this->accountTypeBLL->update($dto2);
         $this->accountTypeBLL->update($dto3);
+        $this->accountTypeBLL->update($dto4);
 
         $this->accountBLL->createAccount('BRLTEST', '___TESTUSER-1', 1000, 1);
     }
